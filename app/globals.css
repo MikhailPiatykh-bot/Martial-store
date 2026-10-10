@@ -1651,8 +1651,15 @@ select.field, .field {
   border-top: 1px solid rgba(246, 241, 232, 0.12);
   font-size: 18px;
 }
-.checkout-done { max-width: 68ch; padding-bottom: 24px; }
-.checkout-done p { color: var(--muted); font-size: 17px; }
+.checkout-done {
+  max-width: 62ch;
+  margin-inline: auto;
+  padding: 28px 0 48px;
+  text-align: center;
+}
+.checkout-done p:not(.kicker) { color: var(--muted); font-size: 17px; }
+.checkout-done strong { color: var(--ink); font-weight: 800; }
+.checkout-done .header-social { justify-content: center; margin: 4px 0 16px; }
 .checkout-done .btn { margin-top: 8px; }
 @media (max-width: 860px) {
   .checkout-grid { grid-template-columns: 1fr; }
