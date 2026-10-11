@@ -5548,7 +5548,7 @@
       "path": "/shop/tproduct/618988042-508213954023-nunchaka-sorevnovatelnaya",
       "title": "Нунчака соревновательная",
       "sku": "",
-      "price": 0,
+      "price": 800,
       "lead": "металическая",
       "text": "",
       "images": [
@@ -5559,7 +5559,7 @@
       ],
       "editions": [
         {
-          "price": 0,
+          "price": 800,
           "options": []
         }
       ],
@@ -5571,7 +5571,7 @@
       "path": "/shop/tproduct/618988042-100913172243-nunchaka",
       "title": "Нунчака",
       "sku": "",
-      "price": 0,
+      "price": 800,
       "lead": "тренировочная",
       "text": "",
       "images": [
@@ -5582,7 +5582,7 @@
       ],
       "editions": [
         {
-          "price": 0,
+          "price": 800,
           "options": []
         }
       ],

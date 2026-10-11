@@ -164,3 +164,11 @@ export function editionLabel(edition: Edition) {
   if (!edition.options.length) return "Базовый вариант";
   return edition.options.map((option) => `${option.name}: ${option.value}`).join(" · ");
 }
+
+const CHOICE_OPTIONS = new Set(["Размер обуви", "Размер одежды", "Длина", "длина клинка", "Возраст"]);
+
+export function editionChoiceLabel(edition: Edition) {
+  const options = edition.options.filter((option) => CHOICE_OPTIONS.has(option.name));
+  if (!options.length) return editionLabel(edition);
+  return options.map((option) => `${option.name}: ${option.value}`).join(" · ");
+}

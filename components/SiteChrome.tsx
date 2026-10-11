@@ -235,9 +235,6 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             </header>
             <nav className="mobile-nav-list">
               <Link href="/catalog" onClick={() => setMenuOpen(false)}>Каталог</Link>
-              {categories.map((category) => (
-                <Link key={category.uid} href={categoryHref(category.title)} onClick={() => setMenuOpen(false)}>{category.title}</Link>
-              ))}
               <Link href="/novinki" onClick={() => setMenuOpen(false)}>Новинки</Link>
               {infoLinks.map((link) => (
                 <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}>{link.label}</Link>
