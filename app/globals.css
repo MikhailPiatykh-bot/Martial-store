@@ -243,6 +243,8 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
 .banner-logo {
   width: min(280px, 100%);
   height: auto;
+  aspect-ratio: 1;
+  flex: none;
 }
 .banner-visual.logo-wall {
   position: relative;
@@ -296,6 +298,8 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
 .banner-float img {
   width: min(220px, 78%);
   height: auto;
+  aspect-ratio: 1;
+  flex: none;
   animation: banner-float 3.4s ease-in-out infinite;
 }
 @keyframes banner-float {
@@ -318,6 +322,8 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
   width: auto;
   max-width: 100%;
   height: min(400px, 100%);
+  aspect-ratio: 659 / 461;
+  flex: none;
   object-fit: contain;
   object-position: center bottom;
 }
@@ -336,6 +342,8 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
   width: auto;
   max-width: none;
   height: 288px;
+  aspect-ratio: 636 / 846;
+  flex: none;
   transform: translateY(22px);
   object-fit: contain;
   object-position: center bottom;
