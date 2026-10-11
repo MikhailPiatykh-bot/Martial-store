@@ -5,6 +5,7 @@ import { categoryFromParams, productsInCategory, toCard } from "@/lib/catalog";
 export const metadata: Metadata = {
   title: { absolute: "Инвентарь для ушу | Martial Store (СТАРАЯ ВЕРСИЯ)" },
   alternates: { canonical: "/shop" },
+  robots: { index: false, follow: false },
 };
 
 export default async function ShopPage({

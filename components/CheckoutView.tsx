@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useCart } from "@/components/CartProvider";
 import { formatPrice } from "@/lib/catalog";
 import { site } from "@/lib/site";
@@ -33,8 +33,10 @@ export function CheckoutView() {
   const [terminal, setTerminal] = useState("");
   const [comment, setComment] = useState("");
   const [consent, setConsent] = useState(false);
+  const [company, setCompany] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
+  const started = useRef(Date.now());
   const [done, setDone] = useState<{ id: string; total: number } | null>(null);
 
   async function submit(event: React.FormEvent) {
@@ -65,6 +67,8 @@ export function CheckoutView() {
           terminal: delivery === "cdek" ? terminal.trim() : "",
           comment: comment.trim(),
           consent: true,
+          company,
+          started: started.current,
           items: cart.items.map((item) => ({
             path: item.path,
             variant: item.variant,
@@ -260,6 +264,12 @@ export function CheckoutView() {
                 <Link href="/pers">согласие на обработку персональных данных</Link> для оформления заказа.
               </span>
             </label>
+            <div className="form-hp" aria-hidden="true">
+              <label>
+                Компания
+                <input tabIndex={-1} autoComplete="off" value={company} onChange={(event) => setCompany(event.target.value)} />
+              </label>
+            </div>
             {errors.consent ? <span className="checkout-error">{errors.consent}</span> : null}
             <button className="btn red" type="submit" disabled={submitting}>
               {submitting ? "Отправляем…" : `Заказать на ${formatPrice(cart.total)}`}

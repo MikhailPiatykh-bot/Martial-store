@@ -5,6 +5,7 @@ import { Article } from "@/components/Article";
 export const metadata: Metadata = {
   title: { absolute: "Blank page" },
   alternates: { canonical: "/page106455226.html" },
+  robots: { index: false, follow: false },
 };
 
 export default function BlankBPage() {

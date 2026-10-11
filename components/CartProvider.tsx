@@ -41,7 +41,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     if (raw) {
       try {
         const parsed = JSON.parse(raw) as CartItem[];
-        if (Array.isArray(parsed)) setItems(parsed);
+        if (Array.isArray(parsed)) setItems(parsed.filter((item) => item.price > 0 && item.qty > 0));
       } catch {
         localStorage.removeItem(STORAGE_KEY);
       }
@@ -65,6 +65,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       open,
       setOpen,
       add: (item) => {
+        if (!(item.price > 0)) return;
         setItems((current) => {
           const index = current.findIndex((entry) => sameLine(entry, item.path, item.variant));
           if (index === -1) return [...current, { ...item, qty: 1 }];

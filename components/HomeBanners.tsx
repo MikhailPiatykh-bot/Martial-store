@@ -17,6 +17,7 @@ type Slide = {
   logos?: BrandLogo[];
   float?: string;
   athlete?: string;
+  photo?: string;
 };
 
 const brandLogos: BrandLogo[] = [
@@ -65,6 +66,7 @@ const slides: Slide[] = [
     cta: "Подробнее",
     href: "/tournament",
     external: false,
+    photo: "/brand/cooperation-group.png?v=3",
   },
   {
     kicker: "",
@@ -155,6 +157,10 @@ export function HomeBanners() {
           ) : slide.athlete ? (
             <div className="banner-visual banner-athlete" aria-hidden="true">
               <img src={slide.athlete} alt="" />
+            </div>
+          ) : slide.photo ? (
+            <div className="banner-visual banner-partners">
+              <img src={slide.photo} alt="Спортсмены Martial Store в форме для ушу" />
             </div>
           ) : (
             <div className={slide.logo ? "banner-visual has-logo" : "banner-visual"} aria-hidden={slide.logo ? undefined : true}>

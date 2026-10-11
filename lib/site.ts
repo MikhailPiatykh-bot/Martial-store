@@ -4,7 +4,7 @@ export const site = {
   phoneHref: "tel:+79852202326",
   whatsapp: "https://wa.me/79852202326",
   telegram: "https://t.me/+79852202326",
-  max: "https://max.ru/",
+  max: "https://max.ru/u/f9LHodD0cOIrrSe1pvDLQ9XrdSx47SYwIL2XQhJBlgNxXq_HU9xauWNyfjo",
   vk: "https://vk.com/im?sel=-57642364",
   vkPage: "https://vk.com/martialstore",
   address: "г. Москва, пр-т Маршала Жукова, 51",
@@ -14,7 +14,7 @@ export const site = {
   ],
   orderHours: "Обработка заказов: 11:00–18:00 мск",
   pickupNote:
-    "Перед визитом на склад предупредите о приезде: можем быть на отправке или приёмке.",
+    "Перед приездом свяжитесь с нами: мы можем отъезжать на отправку или приёмку товара.",
   map: "https://yandex.ru/maps/?pt=37.4621820,55.776608&z=16&l=map",
   mapWidget:
     "https://yandex.ru/map-widget/v1/org/tovary_i_ekipirovka_dlya_ushu_i_kungfu/96913793575/?ll=37.462227%2C55.776568&z=16&theme=dark",

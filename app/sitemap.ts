@@ -13,13 +13,9 @@ const staticPaths = [
   "/vozvrat",
   "/oferta",
   "/politic",
-  "/shop",
   "/users-agreement",
   "/pers",
-  "/page106377886.html",
-  "/page106378306.html",
   "/chinatrip",
-  "/page106455226.html",
   "/tournament",
 ];
 

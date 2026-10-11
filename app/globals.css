@@ -181,8 +181,8 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(180px, 0.85fr);
   align-items: center;
-  height: 420px;
-  min-height: 420px;
+  height: 360px;
+  min-height: 360px;
   padding: 48px 96px 48px;
   overflow: hidden;
   border-radius: 28px;
@@ -318,6 +318,25 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
   width: auto;
   max-width: 100%;
   height: min(400px, 100%);
+  object-fit: contain;
+  object-position: center bottom;
+}
+.banner-partners {
+  align-items: flex-end;
+  justify-content: flex-end;
+  align-self: stretch;
+  min-height: 0;
+  height: 100%;
+  margin-right: 72px;
+  background: transparent;
+  pointer-events: none;
+  overflow: visible;
+}
+.banner-partners img {
+  width: auto;
+  max-width: none;
+  height: 288px;
+  transform: translateY(22px);
   object-fit: contain;
   object-position: center bottom;
 }
@@ -695,6 +714,7 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
 .about-copy .facts { justify-items: center; }
 .prose p, .prose li { font-size: 17px; }
 .prose h2 { font-size: 28px; margin: 28px 0 10px; }
+.prose h3 { font-size: 20px; margin: 18px 0 8px; }
 .prose a { color: var(--red-hot); }
 .prose ul, .prose ol { padding-left: 18px; }
 .delivery-copy .page-title,
@@ -784,6 +804,15 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
   width: 100%;
   height: 100%;
   border: 0;
+}
+.kaishi-video,
+.kaishi-photo {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 12px 0 18px;
+  background: #000;
+  border: 1px solid var(--line);
 }
 
 .product {
@@ -1053,18 +1082,21 @@ select.field, .field {
   .banner-visual { display: none; }
   .banner-visual.has-logo,
   .banner-visual.banner-float,
-  .banner-visual.banner-athlete {
+  .banner-visual.banner-athlete,
+  .banner-visual.banner-partners {
     display: flex;
     min-height: 0;
     margin-top: 8px;
   }
   .banner-float img { width: 140px; }
-  .banner-athlete { height: 220px; }
-  .banner-athlete img { height: 210px; }
+  .banner-athlete { height: 190px; }
+  .banner-athlete img { height: 180px; }
+  .banner-partners { height: 240px; margin-right: 0; justify-content: center; overflow: hidden; }
+  .banner-partners img { height: 230px; max-width: 100%; transform: none; }
   .banner-visual.logo-wall {
     display: block;
     width: 100%;
-    height: 210px;
+    height: 180px;
     min-height: 0;
     margin-top: 18px;
   }
@@ -1250,6 +1282,13 @@ select.field, .field {
   cursor: pointer;
 }
 .china-shot img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; display: block; }
+.form-hp {
+  position: absolute;
+  left: -10000px;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+}
 .china-form {
   max-width: 520px;
   margin: 8px auto 22px;

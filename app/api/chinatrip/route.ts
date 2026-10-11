@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
+import { formsRecipient, rejectFlood, rejectSpam } from "@/lib/formGuard";
 import { wuwayShifts } from "@/lib/wuway";
-
-const RECIPIENT = "9166689046@mail.ru";
 
 function nationalDigits(value: string) {
   let digits = value.replace(/\D/g, "");
@@ -10,12 +9,15 @@ function nationalDigits(value: string) {
 }
 
 export async function POST(request: Request) {
-  let body: { name?: unknown; age?: unknown; phone?: unknown; shift?: unknown };
+  let body: { name?: unknown; age?: unknown; phone?: unknown; shift?: unknown; company?: unknown; started?: unknown };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Не удалось прочитать заявку." }, { status: 400 });
   }
+
+  const spam = rejectSpam(request, body);
+  if (spam) return spam;
 
   const name = typeof body.name === "string" ? body.name.trim().replace(/\s+/g, " ") : "";
   const age = typeof body.age === "number" ? body.age : Number(body.age);
@@ -27,8 +29,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Проверьте имя, возраст, телефон и смену." }, { status: 400 });
   }
 
+  const flood = rejectFlood(request);
+  if (flood) return flood;
+
+  const recipient = formsRecipient();
+  if (!recipient) {
+    return NextResponse.json({ error: "Не удалось отправить заявку. Попробуйте ещё раз." }, { status: 503 });
+  }
+
   const origin = request.headers.get("origin") || "https://martial-store.ru";
-  const response = await fetch(`https://formsubmit.co/ajax/${RECIPIENT}`, {
+  const response = await fetch(`https://formsubmit.co/ajax/${recipient}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -58,7 +68,7 @@ export async function POST(request: Request) {
     return NextResponse.json(
       {
         error:
-          "На почту 9166689046@mail.ru отправлено письмо для включения формы. Откройте его и нажмите ссылку, затем отправьте заявку ещё раз.",
+          "На почту магазина отправлено письмо для включения формы. Откройте его и нажмите ссылку, затем отправьте заявку ещё раз.",
       },
       { status: 409 },
     );

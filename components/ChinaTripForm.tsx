@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { wuwayShifts } from "@/lib/wuway";
 
 function nationalDigits(value: string) {
@@ -25,8 +25,10 @@ export function ChinaTripForm() {
   const [phoneDigits, setPhoneDigits] = useState("");
   const [shift, setShift] = useState("");
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [company, setCompany] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const started = useRef(Date.now());
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
@@ -46,7 +48,14 @@ export function ChinaTripForm() {
       const response = await fetch("/api/chinatrip", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: cleanName, age: ageNum, phone: `+7${phoneDigits}`, shift }),
+        body: JSON.stringify({
+          name: cleanName,
+          age: ageNum,
+          phone: `+7${phoneDigits}`,
+          shift,
+          company,
+          started: started.current,
+        }),
       });
       const data = (await response.json().catch(() => ({}))) as { error?: string };
       if (!response.ok) {
@@ -118,6 +127,12 @@ export function ChinaTripForm() {
         </select>
         {errors.shift ? <span>{errors.shift}</span> : null}
       </label>
+      <div className="form-hp" aria-hidden="true">
+        <label>
+          Компания
+          <input tabIndex={-1} autoComplete="off" value={company} onChange={(event) => setCompany(event.target.value)} />
+        </label>
+      </div>
       {errors.form ? <p className="china-form-error">{errors.form}</p> : null}
       <button type="submit" className="china-submit" disabled={submitting}>
         {submitting ? "Отправляем…" : "Отправить заявку"}

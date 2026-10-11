@@ -6,6 +6,7 @@ import { site } from "@/lib/site";
 export const metadata: Metadata = {
   title: { absolute: "Webinar" },
   alternates: { canonical: "/page106378306.html" },
+  robots: { index: false, follow: false },
 };
 
 export default function WebinarPage() {

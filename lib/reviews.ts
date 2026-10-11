@@ -180,13 +180,6 @@ export const reviews: Review[] = [
   },
   {
     source: "Яндекс Карты",
-    name: "Михаил Пятых",
-    date: "7 сентября 2026",
-    rating: 5,
-    text: "Приглашаем посетить магазин. Большой выбор товаров.",
-  },
-  {
-    source: "Яндекс Карты",
     name: "gildiyakuznecov",
     date: "16 сентября 2026",
     rating: 5,

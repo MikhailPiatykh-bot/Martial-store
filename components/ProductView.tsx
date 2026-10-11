@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useCart } from "@/components/CartProvider";
 import { bazaEmbedSrc } from "@/lib/baza";
-import { categoryHref, editionLabel, formatPrice, type Product } from "@/lib/catalog";
+import { categoryHref, editionLabel, priceLabel, type Product } from "@/lib/catalog";
 
 type Slide = { kind: "video" | "image"; src: string };
 
@@ -40,7 +40,7 @@ export function ProductView({ product }: { product: Product }) {
   const [slideIndex, setSlideIndex] = useState(0);
   const [editionIndex, setEditionIndex] = useState(0);
   const edition = product.editions[editionIndex];
-  const price = edition?.price || product.price;
+  const price = edition ? edition.price : product.price;
   const variant = edition ? editionLabel(edition) : "";
   const slide = slides[slideIndex] ?? slides[0];
   const image = product.images[0] || "";
@@ -83,27 +83,31 @@ export function ProductView({ product }: { product: Product }) {
         <p className="kicker">{product.categories.join(" · ") || "Каталог"}</p>
         <h1>{product.title}</h1>
         {product.lead ? <p className="lede">{product.lead}</p> : null}
-        <div className="price">{formatPrice(price)}</div>
+        <div className="price">{priceLabel(price)}</div>
         {product.editions.length > 1 && (
           <label>
             Вариант
             <select className="field" value={editionIndex} onChange={(event) => setEditionIndex(Number(event.target.value))}>
               {product.editions.map((item, index) => (
                 <option key={`${editionLabel(item)}-${index}`} value={index}>
-                  {editionLabel(item)} — {formatPrice(item.price)}
+                  {editionLabel(item)} — {priceLabel(item.price)}
                 </option>
               ))}
             </select>
           </label>
         )}
         {product.editions.length === 1 && edition?.options.length ? <p>{editionLabel(edition)}</p> : null}
-        <button
-          className="btn red"
-          type="button"
-          onClick={() => cart.add({ path: product.path, title: product.title, price, image, variant })}
-        >
-          Добавить в корзину
-        </button>
+        {price > 0 ? (
+          <button
+            className="btn red"
+            type="button"
+            onClick={() => cart.add({ path: product.path, title: product.title, price, image, variant })}
+          >
+            Добавить в корзину
+          </button>
+        ) : (
+          <p>Этот товар пока нельзя заказать на сайте. Напишите нам, чтобы уточнить цену.</p>
+        )}
         <div>
           {product.categories.map((category) => (
             <Link key={category} href={categoryHref(category)}>{category}</Link>

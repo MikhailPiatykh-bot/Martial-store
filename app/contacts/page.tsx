@@ -28,7 +28,7 @@ export default function ContactsPage() {
         <div className="panel">
           <h2>Шоурум</h2>
           <p>Москва, проспект Маршала Жукова, дом 51.</p>
-          <p>Перед приездом свяжитесь с нами мы можем отъезжать на отправку или приёмку товара.</p>
+          <p>{site.pickupNote}</p>
           <iframe
             className="contacts-map"
             title="Martial Store на Яндекс Картах"

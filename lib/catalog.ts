@@ -156,6 +156,10 @@ export function formatPrice(value: number) {
   return `${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 0 }).format(value)} ₽`;
 }
 
+export function priceLabel(value: number) {
+  return value > 0 ? formatPrice(value) : "Цена по запросу";
+}
+
 export function editionLabel(edition: Edition) {
   if (!edition.options.length) return "Базовый вариант";
   return edition.options.map((option) => `${option.name}: ${option.value}`).join(" · ");

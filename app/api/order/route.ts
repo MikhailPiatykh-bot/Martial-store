@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { editionLabel, formatPrice, products } from "@/lib/catalog";
-
-const RECIPIENT = "9166689046@mail.ru";
+import { formsRecipient, rejectFlood, rejectSpam } from "@/lib/formGuard";
 
 type IncomingItem = {
   path?: unknown;
@@ -30,10 +29,11 @@ function resolveLine(item: IncomingItem): Line | null {
   if (!product) return null;
   if (!product.editions.length) {
     if (item.variant !== "") return null;
+    if (!(product.price > 0)) return null;
     return { title: product.title, variant: "", qty, price: product.price };
   }
   const edition = product.editions.find((entry) => editionLabel(entry) === item.variant);
-  if (!edition) return null;
+  if (!edition || !(edition.price > 0)) return null;
   return { title: product.title, variant: item.variant, qty, price: edition.price };
 }
 
@@ -96,7 +96,9 @@ async function sendEmail(
   composition: string,
 ) {
   const origin = request.headers.get("origin") || "https://martial-store.ru";
-  const response = await fetch(`https://formsubmit.co/ajax/${RECIPIENT}`, {
+  const recipient = formsRecipient();
+  if (!recipient) return "failed" as const;
+  const response = await fetch(`https://formsubmit.co/ajax/${recipient}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -142,12 +144,17 @@ export async function POST(request: Request) {
     comment?: unknown;
     consent?: unknown;
     items?: unknown;
+    company?: unknown;
+    started?: unknown;
   };
   try {
     body = await request.json();
   } catch {
     return NextResponse.json({ error: "Не удалось прочитать заказ." }, { status: 400 });
   }
+
+  const spam = rejectSpam(request, body);
+  if (spam) return spam;
 
   const name = typeof body.name === "string" ? body.name.trim().replace(/\s+/g, " ") : "";
   const phone = typeof body.phone === "string" ? nationalDigits(body.phone) : "";
@@ -167,6 +174,9 @@ export async function POST(request: Request) {
   if (!nameOk || !phoneOk || !deliveryOk || !commentOk || !linesOk || body.consent !== true) {
     return NextResponse.json({ error: "Проверьте данные получателя и состав заказа." }, { status: 400 });
   }
+
+  const flood = rejectFlood(request);
+  if (flood) return flood;
 
   const total = lines.reduce((sum, line) => sum + line.price * line.qty, 0);
   const id = orderId();

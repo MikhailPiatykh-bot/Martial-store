@@ -11,7 +11,7 @@ import {
   categories,
   categoryHref,
   categoryImage,
-  formatPrice,
+  priceLabel,
   optionValues,
   type ProductCard,
 } from "@/lib/catalog";
@@ -251,7 +251,7 @@ export function CatalogView({
                   <div>
                     <small>{card.categories.join(" · ")}</small>
                     <strong>{card.title}</strong>
-                    <span>{formatPrice(card.price)}</span>
+                    <span>{priceLabel(card.price)}</span>
                   </div>
                 </Link>
               ))}
