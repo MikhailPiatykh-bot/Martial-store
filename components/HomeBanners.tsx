@@ -93,7 +93,6 @@ export function HomeBanners() {
     return () => window.clearInterval(timer);
   }, [paused]);
 
-  const slide = slides[index];
   const step = (delta: number) => {
     setIndex((current) => (current + delta + slides.length) % slides.length);
   };
@@ -109,73 +108,85 @@ export function HomeBanners() {
       onBlur={() => setPaused(false)}
     >
       <div className="wrap">
-        <article className="banner-card" aria-live="polite">
-          <div className="banner-copy">
-            {slide.kicker ? <p className="banner-kicker">{slide.kicker}</p> : null}
-            {index === 0 ? (
-              <h1 className="banner-title">
-                {slide.title}
-                {slide.accent ? <span> {slide.accent}</span> : null}
-              </h1>
-            ) : (
-              <h2 className="banner-title">
-                {slide.title}
-                {slide.accent ? <span> {slide.accent}</span> : null}
-              </h2>
-            )}
-            {slide.note ? <p className="banner-note">{slide.note}</p> : null}
-            {slide.cta ? (
-              slide.external ? (
-                <a className="banner-cta" href={slide.href} target="_blank" rel="noreferrer">
-                  {slide.cta}
-                </a>
-              ) : (
-                <Link className="banner-cta" href={slide.href}>
-                  {slide.cta}
-                </Link>
-              )
-            ) : null}
-          </div>
-          {slide.logos ? (
-            <div className="banner-visual logo-wall" aria-hidden="true">
-              <ul>
-                {Array.from({ length: 24 }, (_, index) => {
-                  const logo = slide.logos?.[index % slide.logos.length];
-                  if (!logo) return null;
-                  return (
-                    <li key={index}>
-                      <img src={logo.src} alt="" />
-                    </li>
-                  );
-                })}
-              </ul>
-            </div>
-          ) : slide.float ? (
-            <div className="banner-visual banner-float" aria-hidden="true">
-              <img src={slide.float} alt="" />
-            </div>
-          ) : slide.athlete ? (
-            <div className="banner-visual banner-athlete" aria-hidden="true">
-              <img src={slide.athlete} alt="" />
-            </div>
-          ) : slide.photo ? (
-            <div className="banner-visual banner-partners">
-              <img src={slide.photo} alt="Спортсмены Martial Store в форме для ушу" />
-            </div>
-          ) : (
-            <div className={slide.logo ? "banner-visual has-logo" : "banner-visual"} aria-hidden={slide.logo ? undefined : true}>
-              {slide.logo ? (
-                <img className="banner-logo" src={slide.logo} alt="Логотип Профессионального Альянса Ушу и Кунгфу" />
-              ) : null}
-            </div>
-          )}
+        <div className="banner-stage">
+          {slides.map((item, itemIndex) => {
+            const active = itemIndex === index;
+            return (
+              <article
+                key={item.title}
+                className={active ? "banner-card" : "banner-card banner-card-off"}
+                aria-hidden={active ? undefined : true}
+                inert={active ? undefined : true}
+              >
+                <div className="banner-copy">
+                  {item.kicker ? <p className="banner-kicker">{item.kicker}</p> : null}
+                  {itemIndex === 0 ? (
+                    <h1 className="banner-title">
+                      {item.title}
+                      {item.accent ? <span> {item.accent}</span> : null}
+                    </h1>
+                  ) : (
+                    <h2 className="banner-title">
+                      {item.title}
+                      {item.accent ? <span> {item.accent}</span> : null}
+                    </h2>
+                  )}
+                  {item.note ? <p className="banner-note">{item.note}</p> : null}
+                  {item.cta ? (
+                    item.external ? (
+                      <a className="banner-cta" href={item.href} target="_blank" rel="noreferrer">
+                        {item.cta}
+                      </a>
+                    ) : (
+                      <Link className="banner-cta" href={item.href}>
+                        {item.cta}
+                      </Link>
+                    )
+                  ) : null}
+                </div>
+                {item.logos ? (
+                  <div className="banner-visual logo-wall" aria-hidden="true">
+                    <ul>
+                      {Array.from({ length: 24 }, (_, logoIndex) => {
+                        const logo = item.logos?.[logoIndex % item.logos.length];
+                        if (!logo) return null;
+                        return (
+                          <li key={logoIndex}>
+                            <img src={logo.src} alt="" />
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ) : item.float ? (
+                  <div className="banner-visual banner-float" aria-hidden="true">
+                    <img src={item.float} alt="" />
+                  </div>
+                ) : item.athlete ? (
+                  <div className="banner-visual banner-athlete" aria-hidden="true">
+                    <img src={item.athlete} alt="" />
+                  </div>
+                ) : item.photo ? (
+                  <div className="banner-visual banner-partners">
+                    <img src={item.photo} alt="Спортсмены Martial Store в форме для ушу" />
+                  </div>
+                ) : (
+                  <div className={item.logo ? "banner-visual has-logo" : "banner-visual"} aria-hidden={item.logo ? undefined : true}>
+                    {item.logo ? (
+                      <img className="banner-logo" src={item.logo} alt="Логотип Профессионального Альянса Ушу и Кунгфу" />
+                    ) : null}
+                  </div>
+                )}
+              </article>
+            );
+          })}
           <button className="banner-arrow prev" type="button" aria-label="Предыдущий баннер" onClick={() => step(-1)}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.5 5.5 8 12l6.5 6.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
           <button className="banner-arrow next" type="button" aria-label="Следующий баннер" onClick={() => step(1)}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9.5 5.5 16 12l-6.5 6.5" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
           </button>
-        </article>
+        </div>
       </div>
     </section>
   );

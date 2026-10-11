@@ -176,6 +176,7 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
 .burger { display: none; }
 
 .home-banners { padding: 18px 0 6px; }
+.banner-stage { position: relative; }
 .banner-card {
   position: relative;
   display: grid;
@@ -190,6 +191,12 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
     radial-gradient(55% 90% at 82% 42%, rgba(200, 16, 46, 0.34), transparent 62%),
     linear-gradient(105deg, #100808 0%, #1c0d0e 48%, #2a1214 100%);
   border: 1px solid rgba(200, 16, 46, 0.4);
+}
+.banner-card.banner-card-off {
+  position: absolute;
+  inset: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
 .banner-copy { position: relative; z-index: 1; max-width: 680px; }
 .banner-kicker {
