@@ -223,7 +223,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             </ul>
           </div>
         </div>
-        <div className="wrap legal">{site.sellerShort}. ОГРНИП {site.ogrnip}. ИНН {site.inn}.</div>
+        <div className="wrap legal">{site.sellerShort} ОГРНИП {site.ogrnip}. ИНН {site.inn}.</div>
       </footer>
 
       {menuOpen && (
