@@ -282,7 +282,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               {cart.items.length > 0 ? (
                 <>
                   <strong>Итого: {formatPrice(cart.total)}</strong>
-                  <p className="muted">Наличие и оплату подтвердим после заказа. Доставка — в пункт СДЭК, самовывоз — из шоурума.</p>
+                  <p className="muted">Это заявка: наличие подтвердим после заказа, способ оплаты согласует менеджер. На сайте, в том числе картой, оплатить нельзя. Доставка — в пункт СДЭК, самовывоз — из шоурума.</p>
                   <button
                     className="btn red"
                     type="button"

@@ -19,7 +19,7 @@ export const site = {
   mapWidget:
     "https://yandex.ru/map-widget/v1/org/tovary_i_ekipirovka_dlya_ushu_i_kungfu/96913793575/?ll=37.462227%2C55.776568&z=16&theme=dark",
   seller: "ИП Пятых Михаил Александрович",
-  sellerShort: "ИП Пятых М.А.",
+  sellerShort: "ИП Пятых М. А.",
   ogrnip: "315774600280742",
   inn: "772374585850",
   offerDate: "08.04.2025",
