@@ -131,6 +131,20 @@ export function HomeBanners() {
                       ))}
                       {item.accent ? <><br /><span>{item.accent}</span></> : null}
                     </h1>
+                  ) : item.logo ? (
+                    <h2 className="banner-title banner-title-pak">
+                      <span className="pak-desk">Официальный партнер «Профессиональный Альянс Ушу и Кунгфу»</span>
+                      <span className="pak-land">
+                        <span>Официальный партнер</span>
+                        <span>«Профессиональный Альянс</span>
+                        <span>Ушу и Кунгфу»</span>
+                      </span>
+                      <span className="pak-port">
+                        <span>Официальный партнер</span>
+                        <span>«Профессиональный</span>
+                        <span>Альянс Ушу и Кунгфу»</span>
+                      </span>
+                    </h2>
                   ) : (
                     <h2 className="banner-title">
                       {titleLines.map((line, lineIndex) => (
