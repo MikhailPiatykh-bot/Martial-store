@@ -52,13 +52,19 @@ export function CheckoutView() {
     }
     if (!consent) next.consent = "Нужно согласие, чтобы оформить заказ";
     setErrors(next);
-    if (Object.keys(next).length > 0) return;
+    if (Object.keys(next).length > 0) {
+      requestAnimationFrame(() => {
+        document.querySelector(".checkout-alert")?.scrollIntoView({ block: "center" });
+      });
+      return;
+    }
 
     setSubmitting(true);
     try {
       const response = await fetch("/api/order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(20000),
         body: JSON.stringify({
           name: cleanName,
           phone: `+7${phoneDigits}`,
@@ -79,6 +85,9 @@ export function CheckoutView() {
       const data = (await response.json().catch(() => ({}))) as { error?: string; id?: string; total?: number };
       if (!response.ok || !data.id || typeof data.total !== "number") {
         setErrors({ form: data.error || "Не удалось отправить заказ. Попробуйте ещё раз." });
+        requestAnimationFrame(() => {
+          document.querySelector(".checkout-alert")?.scrollIntoView({ block: "center" });
+        });
         return;
       }
       setDone({ id: data.id, total: data.total });
@@ -265,12 +274,10 @@ export function CheckoutView() {
               </span>
             </label>
             <div className="form-hp" aria-hidden="true">
-              <label>
-                Компания
-                <input tabIndex={-1} autoComplete="off" value={company} onChange={(event) => setCompany(event.target.value)} />
-              </label>
+              <input tabIndex={-1} autoComplete="off" value={company} onChange={(event) => setCompany(event.target.value)} />
             </div>
             {errors.consent ? <span className="checkout-error">{errors.consent}</span> : null}
+            {errors.form ? <p className="checkout-error checkout-alert">{errors.form}</p> : Object.keys(errors).length > 0 ? <p className="checkout-error checkout-alert">Проверьте поля выше: без них заказ не отправится.</p> : null}
             <button className="btn red" type="submit" disabled={submitting}>
               {submitting ? "Отправляем…" : `Заказать на ${formatPrice(cart.total)}`}
             </button>

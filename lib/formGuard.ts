@@ -20,7 +20,7 @@ export function rejectSpam(request: Request, body: { company?: unknown; started?
 
   const started = typeof body.started === "number" ? body.started : Number(body.started);
   const elapsed = Date.now() - started;
-  if (!Number.isFinite(started) || elapsed < 1500 || elapsed > 6 * 60 * 60 * 1000) {
+  if (!Number.isFinite(started) || elapsed < -2 * 60 * 1000 || elapsed > 12 * 60 * 60 * 1000) {
     return NextResponse.json({ error: "Подождите пару секунд и отправьте ещё раз." }, { status: 400 });
   }
 

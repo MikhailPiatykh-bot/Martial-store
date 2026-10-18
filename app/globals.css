@@ -1155,8 +1155,9 @@ select.field, .field {
   }
   .banner-card {
     grid-template-columns: 1fr;
-    height: auto;
-    min-height: 0;
+    height: 520px;
+    min-height: 520px;
+    align-content: center;
     padding: 28px 58px 36px;
   }
   .banner-visual { display: none; }
@@ -1192,6 +1193,23 @@ select.field, .field {
   .banner-arrow { width: 38px; height: 38px; }
   .banner-arrow.prev { left: 10px; }
   .banner-arrow.next { right: 10px; }
+}
+@media (orientation: landscape) and (max-height: 520px) {
+  .banner-card {
+    height: 250px;
+    min-height: 250px;
+    padding: 16px 64px;
+  }
+  .banner-kicker { margin-bottom: 4px; font-size: 15px; }
+  .banner-title { font-size: 24px; }
+  .banner-note { margin-top: 6px; font-size: 15px; }
+  .banner-cta { min-height: 38px; margin-top: 10px; padding: 0 16px; font-size: 14px; }
+  .banner-visual { min-height: 0; }
+  .banner-partners { margin-right: 16px; }
+  .banner-partners img { height: 210px; transform: translateY(10px); }
+  .banner-athlete img { height: 200px; }
+  .banner-float img { width: min(140px, 70%); }
+  .banner-logo { width: min(150px, 78%); }
 }
 
 

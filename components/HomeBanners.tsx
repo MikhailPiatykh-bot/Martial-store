@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 
 type BrandLogo = { src: string; alt: string };
 
@@ -30,7 +30,7 @@ const brandLogos: BrandLogo[] = [
 const slides: Slide[] = [
   {
     kicker: "Поставщик оригинальной продукции:",
-    title: "CC Wushu, Feiyue TopOne, Feiyue DaFu, Budosaga, Dari Huntong, Wesing",
+    title: "CC Wushu, Feiyue, Budosaga, Dari Huntong, Wesing",
     accent: "",
     note: "",
     cta: "Перейти в каталог",
@@ -50,7 +50,7 @@ const slides: Slide[] = [
   },
   {
     kicker: "",
-    title: "Обучающие видео и база знаний",
+    title: "Обучающие видео\nи база знаний",
     accent: "",
     note: "",
     cta: "Подробнее",
@@ -70,7 +70,7 @@ const slides: Slide[] = [
   },
   {
     kicker: "",
-    title: "Официальный партнер ООО «Профессиональный Альянс Ушу и Кунгфу»",
+    title: "Официальный партнер «Профессиональный Альянс Ушу и Кунгфу»",
     accent: "",
     note: "",
     cta: "",
@@ -111,6 +111,7 @@ export function HomeBanners() {
         <div className="banner-stage">
           {slides.map((item, itemIndex) => {
             const active = itemIndex === index;
+            const titleLines = item.title.split("\n");
             return (
               <article
                 key={item.title}
@@ -122,13 +123,23 @@ export function HomeBanners() {
                   {item.kicker ? <p className="banner-kicker">{item.kicker}</p> : null}
                   {itemIndex === 0 ? (
                     <h1 className="banner-title">
-                      {item.title}
-                      {item.accent ? <span> {item.accent}</span> : null}
+                      {titleLines.map((line, lineIndex) => (
+                        <Fragment key={line}>
+                          {lineIndex > 0 ? <br /> : null}
+                          {line}
+                        </Fragment>
+                      ))}
+                      {item.accent ? <><br /><span>{item.accent}</span></> : null}
                     </h1>
                   ) : (
                     <h2 className="banner-title">
-                      {item.title}
-                      {item.accent ? <span> {item.accent}</span> : null}
+                      {titleLines.map((line, lineIndex) => (
+                        <Fragment key={line}>
+                          {lineIndex > 0 ? <br /> : null}
+                          {line}
+                        </Fragment>
+                      ))}
+                      {item.accent ? <><br /><span>{item.accent}</span></> : null}
                     </h2>
                   )}
                   {item.note ? <p className="banner-note">{item.note}</p> : null}

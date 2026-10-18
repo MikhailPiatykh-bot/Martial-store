@@ -78,6 +78,7 @@ async function sendTelegram(token: string, chatId: string, text: string) {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ chat_id: chatId, text }),
+    signal: AbortSignal.timeout(12000),
   });
   const payload = (await response.json().catch(() => null)) as { ok?: boolean } | null;
   return response.ok && payload?.ok === true;
@@ -106,6 +107,7 @@ async function sendEmail(
       Origin: origin,
       Referer: `${origin}/checkout`,
     },
+    signal: AbortSignal.timeout(12000),
     body: JSON.stringify({
       _subject: `Заказ ${id} — ${formatPrice(total)}`,
       _template: "table",
@@ -202,15 +204,25 @@ export async function POST(request: Request) {
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
   if (token && chatId) {
-    const sent = await sendTelegram(token, chatId, text);
+    let sent = false;
+    try {
+      sent = await sendTelegram(token, chatId, text);
+    } catch {
+      sent = false;
+    }
     if (!sent) {
       return NextResponse.json({ error: "Не удалось отправить заказ. Попробуйте ещё раз." }, { status: 502 });
     }
-    await sendEmail(request, id, total, name, phone, delivery, city, terminal, comment, composition);
+    void sendEmail(request, id, total, name, phone, delivery, city, terminal, comment, composition).catch(() => undefined);
     return NextResponse.json({ ok: true, id, total });
   }
 
-  const email = await sendEmail(request, id, total, name, phone, delivery, city, terminal, comment, composition);
+  let email: "ok" | "failed" | "activation" = "failed";
+  try {
+    email = await sendEmail(request, id, total, name, phone, delivery, city, terminal, comment, composition);
+  } catch {
+    email = "failed";
+  }
   if (email === "activation") {
     return NextResponse.json(
       {
