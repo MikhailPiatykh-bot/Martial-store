@@ -246,7 +246,6 @@ export function CatalogView({
                 <Link key={card.path} href={card.path} className="card">
                   <span className="card-media">
                     {card.image ? <img src={card.image} alt="" /> : <span className="ph" />}
-                    {card.videos.length > 0 ? <span className="card-play" aria-hidden="true" /> : null}
                   </span>
                   <div>
                     <small>{card.categories.join(" · ")}</small>
