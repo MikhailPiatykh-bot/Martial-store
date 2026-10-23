@@ -80,8 +80,11 @@ async function sendTelegram(token: string, chatId: string, text: string) {
     body: JSON.stringify({ chat_id: chatId, text }),
     signal: AbortSignal.timeout(12000),
   });
-  const payload = (await response.json().catch(() => null)) as { ok?: boolean } | null;
-  return response.ok && payload?.ok === true;
+  const payload = (await response.json().catch(() => null)) as { ok?: boolean; description?: string } | null;
+  if (response.ok && payload?.ok === true) return true;
+  const description = typeof payload?.description === "string" ? payload.description.slice(0, 180) : "";
+  console.error("order telegram response", response.status, description);
+  return false;
 }
 
 async function sendEmail(
@@ -203,16 +206,18 @@ export async function POST(request: Request) {
 
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
+  let telegramSent = false;
   if (token && chatId) {
-    let sent = false;
     try {
-      sent = await sendTelegram(token, chatId, text);
-    } catch {
-      sent = false;
+      telegramSent = await sendTelegram(token, chatId, text);
+      if (!telegramSent) console.error("order telegram declined", id);
+    } catch (error) {
+      console.error("order telegram failed", error instanceof Error ? error.name : "error");
+      telegramSent = false;
     }
-    if (!sent) {
-      return NextResponse.json({ error: "Не удалось отправить заказ. Попробуйте ещё раз." }, { status: 502 });
-    }
+  }
+
+  if (telegramSent) {
     void sendEmail(request, id, total, name, phone, delivery, city, terminal, comment, composition).catch(() => undefined);
     return NextResponse.json({ ok: true, id, total });
   }
@@ -220,9 +225,11 @@ export async function POST(request: Request) {
   let email: "ok" | "failed" | "activation" = "failed";
   try {
     email = await sendEmail(request, id, total, name, phone, delivery, city, terminal, comment, composition);
-  } catch {
+  } catch (error) {
+    console.error("order email failed", error instanceof Error ? error.name : "error");
     email = "failed";
   }
+  if (email === "ok") return NextResponse.json({ ok: true, id, total });
   if (email === "activation") {
     return NextResponse.json(
       {
@@ -232,9 +239,5 @@ export async function POST(request: Request) {
       { status: 409 },
     );
   }
-  if (email === "failed") {
-    return NextResponse.json({ error: "Не удалось отправить заказ. Попробуйте ещё раз." }, { status: 502 });
-  }
-
-  return NextResponse.json({ ok: true, id, total });
+  return NextResponse.json({ error: "Не удалось отправить заказ. Попробуйте ещё раз." }, { status: 502 });
 }
