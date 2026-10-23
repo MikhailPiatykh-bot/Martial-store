@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: telegram-outbox
@@ -24,3 +25,10 @@ jobs:
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      - name: Check again shortly
+        if: always()
+        run: |
+          sleep 50
+          gh workflow run telegram-outbox.yml --ref main
+        env:
+          GH_TOKEN: ${{ github.token }}
