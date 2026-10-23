@@ -1,0 +1,30 @@
+name: Update Yandex reviews
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node --experimental-strip-types .github/scripts/update-yandex-reviews.ts
+      - name: Commit saved reviews
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/yandex-reviews.json
+          if git diff --cached --quiet; then
+            echo "unchanged"
+            exit 0
+          fi
+          git commit -m "Update the saved Yandex reviews."
+          git push

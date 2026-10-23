@@ -1,3 +1,5 @@
+import savedFile from "@/data/yandex-reviews.json";
+
 export type Review = {
   id?: string;
   source: "Яндекс Карты";
@@ -297,20 +299,52 @@ export function parseYandexReviewsHtml(html: string) {
   return { reviews: parsed, total: total > 0 ? total : parsed.length };
 }
 
+const savedReviewsUrl =
+  "https://raw.githubusercontent.com/MikhailPiatykh-bot/Martial-store/main/data/yandex-reviews.json";
+
+function savedReviews(value: unknown) {
+  if (!value || typeof value !== "object") return null;
+  const record = value as { reviews?: Review[]; total?: number };
+  if (!Array.isArray(record.reviews)) return null;
+  const list = record.reviews.filter(
+    (item) => item?.source === "Яндекс Карты" && item.name && item.text && item.rating >= 1 && item.rating <= 5,
+  );
+  if (!list.length) return null;
+  const total = typeof record.total === "number" && record.total > 0 ? record.total : list.length;
+  return { reviews: list, total };
+}
+
 export async function loadYandexReviews() {
   try {
     const response = await fetch(yandexReviewsPage, {
       headers: {
-        "Accept-Language": "ru",
-        "User-Agent": "Mozilla/5.0",
+        "Accept-Language": "ru-RU,ru;q=0.9",
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36",
       },
+      signal: AbortSignal.timeout(12000),
       next: { revalidate: 3600 },
     });
-    if (!response.ok) throw new Error(String(response.status));
-    const parsed = parseYandexReviewsHtml(await response.text());
-    if (!parsed) throw new Error("empty");
-    return parsed;
+    if (response.ok) {
+      const parsed = parseYandexReviewsHtml(await response.text());
+      if (parsed) return parsed;
+    }
   } catch {
-    return { reviews, total: reviews.length };
+    // The shop server often gets no answer from Yandex. The saved snapshot is used instead.
   }
+
+  try {
+    const response = await fetch(savedReviewsUrl, {
+      signal: AbortSignal.timeout(12000),
+      next: { revalidate: 3600 },
+    });
+    if (response.ok) {
+      const saved = savedReviews(await response.json());
+      if (saved) return saved;
+    }
+  } catch {
+    // Use the snapshot bundled with this version of the site.
+  }
+
+  return savedReviews(savedFile) ?? { reviews, total: reviews.length };
 }
