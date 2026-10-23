@@ -1,9 +1,12 @@
 import Link from "next/link";
 import { ReviewsRail } from "@/components/ReviewsRail";
-import { categories, categoryHref, categoryImage } from "@/lib/catalog";
-import { reviews, yandexReviewsUrl } from "@/lib/reviews";
+import { categories, categoryHref, categoryImage, priceLabel } from "@/lib/catalog";
+import { SALE_CATEGORY, rasprodazhaCards } from "@/lib/rasprodazha";
+import { loadYandexReviews, reviewsLabel, yandexReviewsUrl } from "@/lib/reviews";
 
-export default function HomePage() {
+export default async function HomePage() {
+  const { reviews, total } = await loadYandexReviews();
+  const sale = rasprodazhaCards();
   return (
     <>
       <section className="section advantages" id="advantages">
@@ -23,6 +26,31 @@ export default function HomePage() {
           </ul>
         </div>
       </section>
+
+      {sale.length > 0 ? (
+      <section className="section sale" id="rasprodazha">
+        <div className="wrap">
+          <div className="sale-head">
+            <h2>Распродажа</h2>
+            <Link href={categoryHref(SALE_CATEGORY)}>Смотреть все</Link>
+          </div>
+            <div className="grid">
+              {sale.map((card) => (
+                <Link key={card.path} href={card.path} className="card">
+                  <span className="card-media">
+                    {card.image ? <img src={card.image} alt="" /> : <span className="ph" />}
+                  </span>
+                  <div>
+                    <small>{card.categories.join(" · ")}</small>
+                    <strong>{card.title}</strong>
+                    <span>{priceLabel(card.price)}</span>
+                  </div>
+                </Link>
+              ))}
+            </div>
+        </div>
+      </section>
+      ) : null}
 
       <section className="section">
         <div className="wrap">
@@ -46,12 +74,12 @@ export default function HomePage() {
           <h2>Отзывы</h2>
           <p className="reviews-lead">
             <a href={yandexReviewsUrl} target="_blank" rel="noreferrer">
-              Яндекс Карты · {reviews.length} отзывов
+              Яндекс Карты · {total} {reviewsLabel(total)}
             </a>
           </p>
           <ReviewsRail>
             {reviews.map((review) => (
-              <article key={`${review.name}-${review.date}`} className="review-card">
+              <article key={review.id ?? `${review.name}-${review.date}`} className="review-card">
                 <div className="review-top">
                   <span className="review-stars" aria-label={`Оценка ${review.rating} из 5`}>
                     {"★★★★★".slice(0, review.rating)}

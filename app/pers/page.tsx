@@ -3,7 +3,7 @@ import { Article } from "@/components/Article";
 import { site } from "@/lib/site";
 
 export const metadata: Metadata = {
-  title: { absolute: "Cогласие на обработку персональных данных" },
+  title: { absolute: "Согласие на обработку персональных данных" },
   alternates: { canonical: "/pers" },
 };
 

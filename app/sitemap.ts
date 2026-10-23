@@ -10,6 +10,7 @@ const staticPaths = [
   "/baza",
   "/catalog",
   "/novinki",
+  "/rasprodazha",
   "/vozvrat",
   "/oferta",
   "/politic",

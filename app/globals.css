@@ -502,6 +502,19 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
 
 .section { padding: 36px 0 12px; }
 .section h2 { font-size: clamp(28px, 4vw, 42px); margin-bottom: 16px; }
+.sale-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+}
+.sale-head h2 { margin-bottom: 16px; }
+.sale-head a {
+  flex: none;
+  color: var(--red-hot);
+  font-weight: 700;
+  text-decoration: none;
+}
 .advantages { text-align: center; }
 .advantages h2 { margin-bottom: 22px; }
 .advantages-list {
@@ -571,7 +584,8 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
 .review-card strong { font-size: 15px; }
 .cat {
   display: flex;
-  min-height: 92px;
+  aspect-ratio: 1;
+  min-height: 0;
   align-items: flex-end;
   padding: 14px;
   text-decoration: none;

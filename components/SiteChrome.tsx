@@ -71,6 +71,18 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
   }, [pathname, cart.setOpen]);
 
   useEffect(() => {
+    function closeDropsOutside(event: PointerEvent) {
+      const target = event.target;
+      if (!(target instanceof Node)) return;
+      document.querySelectorAll("details.drop[open]").forEach((node) => {
+        if (node instanceof HTMLDetailsElement && !node.contains(target)) node.open = false;
+      });
+    }
+    document.addEventListener("pointerdown", closeDropsOutside);
+    return () => document.removeEventListener("pointerdown", closeDropsOutside);
+  }, []);
+
+  useEffect(() => {
     scrollForRoute();
     document.querySelectorAll("details.drop").forEach((node) => {
       if (node instanceof HTMLDetailsElement) node.open = false;
@@ -149,6 +161,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               </div>
             </details>
             <Link href="/novinki">Новинки</Link>
+            <Link href={categoryHref("Распродажа")}>Распродажа</Link>
             <details className="drop">
               <summary>Информация для клиентов</summary>
               <div className="drop-panel" onClick={(event) => {
@@ -236,6 +249,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
             <nav className="mobile-nav-list">
               <Link href="/catalog" onClick={() => setMenuOpen(false)}>Каталог</Link>
               <Link href="/novinki" onClick={() => setMenuOpen(false)}>Новинки</Link>
+              <Link href={categoryHref("Распродажа")} onClick={() => setMenuOpen(false)}>Распродажа</Link>
               {infoLinks.map((link) => (
                 <Link key={link.href} href={link.href} onClick={() => setMenuOpen(false)}>{link.label}</Link>
               ))}

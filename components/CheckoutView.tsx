@@ -266,13 +266,16 @@ export function CheckoutView() {
                 rows={3}
               />
             </label>
-            <label className="checkout-consent">
-              <input type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
+            <div className="checkout-consent">
+              <input id="order-consent" type="checkbox" checked={consent} onChange={(event) => setConsent(event.target.checked)} />
               <span>
-                Принимаю <Link href="/oferta">договор оферты</Link> и даю{" "}
-                <Link href="/pers">согласие на обработку персональных данных</Link> для оформления заказа.
+                <label htmlFor="order-consent">Принимаю</label>{" "}
+                <Link href="/oferta" onClick={(event) => event.stopPropagation()}>договор оферты</Link>{" "}
+                и даю{" "}
+                <Link href="/pers" onClick={(event) => event.stopPropagation()}>согласие на обработку персональных данных</Link>{" "}
+                <label htmlFor="order-consent">для оформления заказа.</label>
               </span>
-            </label>
+            </div>
             <div className="form-hp" aria-hidden="true">
               <input tabIndex={-1} autoComplete="off" value={company} onChange={(event) => setCompany(event.target.value)} />
             </div>

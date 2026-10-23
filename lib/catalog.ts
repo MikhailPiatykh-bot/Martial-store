@@ -64,7 +64,7 @@ const categoryImages: Record<string, string> = {
   "Аксессуары": "/catalog/aksessuary.jpg",
   "Традиционное оружие": "/catalog/tradicionnoe.jpg",
   "Мечи": "/catalog/mechi.jpg",
-  "Палки": "/catalog/palki.jpg",
+  "Палки и копья": "/catalog/palki.jpg",
   "Ковры/помосты/львы": "/catalog/kovry.jpg",
   "Чехлы": "/catalog/chehly.jpg",
   "Саньда": "/catalog/sanda.jpg",
