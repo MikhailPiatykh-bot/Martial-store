@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { editionLabel, formatPrice, products } from "@/lib/catalog";
 import { formsRecipient, rejectFlood, rejectSpam } from "@/lib/formGuard";
+import { enqueueTelegram } from "@/lib/telegramOutbox";
 
 type IncomingItem = {
   path?: unknown;
@@ -214,6 +215,14 @@ export async function POST(request: Request) {
     } catch (error) {
       console.error("order telegram failed", error instanceof Error ? error.name : "error");
       telegramSent = false;
+    }
+  }
+
+  if (!telegramSent && token && chatId) {
+    try {
+      enqueueTelegram(id, text);
+    } catch (error) {
+      console.error("order telegram queue failed", error instanceof Error ? error.name : "error");
     }
   }
 
