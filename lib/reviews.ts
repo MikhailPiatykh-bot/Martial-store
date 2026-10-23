@@ -272,23 +272,23 @@ export function parseYandexReviewsHtml(html: string) {
   const list = (payload as { reviews?: YandexReview[] }).reviews;
   if (!Array.isArray(list)) return null;
   const parsed = list
-    .map((item) => {
+    .flatMap((item) => {
       const name = item.author?.name?.trim() ?? "";
       const text = item.text?.trim() ?? "";
       const rating = Math.round(Number(item.rating));
-      if (!name || !text || name.toLocaleLowerCase("ru") === ownerName) return null;
-      if (!Number.isFinite(rating) || rating < 1 || rating > 5) return null;
-      return {
+      if (!name || !text || name.toLocaleLowerCase("ru") === ownerName) return [];
+      if (!Number.isFinite(rating) || rating < 1 || rating > 5) return [];
+      const review: Review & { time: number } = {
         id: item.reviewId,
-        source: "Яндекс Карты" as const,
+        source: "Яндекс Карты",
         name,
         date: item.updatedTime ? formatReviewDate(item.updatedTime) : "",
         rating,
         text,
         time: item.updatedTime ? Date.parse(item.updatedTime) : 0,
       };
+      return [review];
     })
-    .filter((item): item is Review & { time: number } => Boolean(item))
     .sort((a, b) => b.time - a.time)
     .map(({ time: _time, ...review }) => review);
   if (!parsed.length) return null;
