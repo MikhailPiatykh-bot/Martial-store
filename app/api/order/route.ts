@@ -16,10 +16,28 @@ type Line = {
   price: number;
 };
 
-function nationalDigits(value: string) {
-  let digits = value.replace(/\D/g, "");
-  if (digits.startsWith("7") || digits.startsWith("8")) digits = digits.slice(1);
-  return digits;
+const contactLabels = {
+  telegram: "Телеграм",
+  whatsapp: "WhatsApp",
+  max: "Max",
+  email: "Email",
+} as const;
+
+type Contact = keyof typeof contactLabels;
+
+function internationalPhone(value: string) {
+  const phone = value.trim().replace(/\s+/g, " ");
+  if (phone.length > 24 || !phone.startsWith("+")) return "";
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 8 || digits.length > 15) return "";
+  if (!/^\+[0-9][0-9\s()-]*$/.test(phone)) return "";
+  return phone;
+}
+
+function cleanEmail(value: string) {
+  const email = value.trim().toLowerCase();
+  if (email.length > 120 || !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return "";
+  return email;
 }
 
 function resolveLine(item: IncomingItem): Line | null {
@@ -50,6 +68,8 @@ function orderMessage(order: {
   total: number;
   name: string;
   phone: string;
+  email: string;
+  contact: string;
   delivery: "cdek" | "pickup";
   city: string;
   terminal: string;
@@ -62,6 +82,8 @@ function orderMessage(order: {
     "",
     order.name,
     order.phone,
+    `Почта: ${order.email}`,
+    `Связь: ${order.contact}`,
     order.delivery === "cdek" ? "Получение: пункт СДЭК" : "Получение: самовывоз",
   ];
   if (order.delivery === "cdek") {
@@ -94,6 +116,8 @@ async function sendEmail(
   total: number,
   name: string,
   phone: string,
+  email: string,
+  contact: string,
   delivery: "cdek" | "pickup",
   city: string,
   terminal: string,
@@ -118,7 +142,9 @@ async function sendEmail(
       _captcha: "false",
       Заказ: id,
       Имя: name,
-      Телефон: `+7${phone}`,
+      Телефон: phone,
+      Почта: email,
+      Связь: contact,
       Получение: delivery === "cdek" ? "Пункт СДЭК" : "Самовывоз",
       Город: delivery === "cdek" ? city : "Москва",
       "Пункт СДЭК": delivery === "cdek" ? terminal : "Шоурум, пр-т Маршала Жукова, 51",
@@ -144,6 +170,8 @@ export async function POST(request: Request) {
   let body: {
     name?: unknown;
     phone?: unknown;
+    email?: unknown;
+    contact?: unknown;
     delivery?: unknown;
     city?: unknown;
     terminal?: unknown;
@@ -163,7 +191,9 @@ export async function POST(request: Request) {
   if (spam) return spam;
 
   const name = typeof body.name === "string" ? body.name.trim().replace(/\s+/g, " ") : "";
-  const phone = typeof body.phone === "string" ? nationalDigits(body.phone) : "";
+  const phone = typeof body.phone === "string" ? internationalPhone(body.phone) : "";
+  const email = typeof body.email === "string" ? cleanEmail(body.email) : "";
+  const contact = typeof body.contact === "string" && body.contact in contactLabels ? (body.contact as Contact) : "";
   const delivery = body.delivery === "cdek" || body.delivery === "pickup" ? body.delivery : "";
   const city = typeof body.city === "string" ? body.city.trim().replace(/\s+/g, " ") : "";
   const terminal = typeof body.terminal === "string" ? body.terminal.trim().replace(/\s+/g, " ") : "";
@@ -172,12 +202,14 @@ export async function POST(request: Request) {
   const lines = items.map((item) => resolveLine(item as IncomingItem));
 
   const nameOk = name.split(" ").length >= 2 && name.length <= 120;
-  const phoneOk = phone.length === 10;
+  const phoneOk = phone.length > 0;
+  const emailOk = email.length > 0;
+  const contactOk = contact !== "";
   const deliveryOk = delivery === "pickup" || (delivery === "cdek" && city.length >= 2 && city.length <= 80 && terminal.length >= 5 && terminal.length <= 200);
   const commentOk = comment.length <= 800;
   const linesOk = lines.length > 0 && lines.every((line): line is Line => line !== null);
 
-  if (!nameOk || !phoneOk || !deliveryOk || !commentOk || !linesOk || body.consent !== true) {
+  if (!nameOk || !phoneOk || !emailOk || !contactOk || !deliveryOk || !commentOk || !linesOk || body.consent !== true) {
     return NextResponse.json({ error: "Проверьте данные получателя и состав заказа." }, { status: 400 });
   }
 
@@ -197,7 +229,9 @@ export async function POST(request: Request) {
     id,
     total,
     name,
-    phone: `+7${phone}`,
+    phone,
+    email,
+    contact: contactLabels[contact],
     delivery,
     city,
     terminal,
@@ -227,19 +261,19 @@ export async function POST(request: Request) {
   }
 
   if (telegramSent) {
-    void sendEmail(request, id, total, name, phone, delivery, city, terminal, comment, composition).catch(() => undefined);
+    void sendEmail(request, id, total, name, phone, email, contactLabels[contact], delivery, city, terminal, comment, composition).catch(() => undefined);
     return NextResponse.json({ ok: true, id, total });
   }
 
-  let email: "ok" | "failed" | "activation" = "failed";
+  let mailed: "ok" | "failed" | "activation" = "failed";
   try {
-    email = await sendEmail(request, id, total, name, phone, delivery, city, terminal, comment, composition);
+    mailed = await sendEmail(request, id, total, name, phone, email, contactLabels[contact], delivery, city, terminal, comment, composition);
   } catch (error) {
     console.error("order email failed", error instanceof Error ? error.name : "error");
-    email = "failed";
+    mailed = "failed";
   }
-  if (email === "ok") return NextResponse.json({ ok: true, id, total });
-  if (email === "activation") {
+  if (mailed === "ok") return NextResponse.json({ ok: true, id, total });
+  if (mailed === "activation") {
     return NextResponse.json(
       {
         error:

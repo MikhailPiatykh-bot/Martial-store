@@ -7,27 +7,60 @@ import { formatPrice } from "@/lib/catalog";
 import { site } from "@/lib/site";
 
 type Delivery = "cdek" | "pickup";
+type Contact = "telegram" | "whatsapp" | "max" | "email";
 
-function nationalDigits(value: string) {
-  let digits = value.replace(/\D/g, "");
-  if (digits.startsWith("7") || digits.startsWith("8")) digits = digits.slice(1);
-  return digits.slice(0, 10);
+const contactChoices: { id: Contact; label: string }[] = [
+  { id: "telegram", label: "Телеграм" },
+  { id: "whatsapp", label: "WhatsApp" },
+  { id: "max", label: "Max" },
+  { id: "email", label: "Email" },
+];
+
+function phoneOk(value: string) {
+  if (!value.startsWith("+")) return false;
+  const digits = value.replace(/\D/g, "");
+  return digits.length >= 8 && digits.length <= 15 && /^\+[0-9][0-9\s()-]*$/.test(value);
 }
 
-function formatRuPhone(digits: string) {
-  if (!digits) return "";
-  let out = "+7 (" + digits.slice(0, 3);
-  if (digits.length >= 3) out += ")";
-  if (digits.length > 3) out += " " + digits.slice(3, 6);
-  if (digits.length > 6) out += "-" + digits.slice(6, 8);
-  if (digits.length > 8) out += "-" + digits.slice(8, 10);
-  return out;
+function emailOk(value: string) {
+  return value.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
+}
+
+function ContactIcon({ id }: { id: Contact }) {
+  if (id === "telegram") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M21.5 4.4 2.7 11.2c-.9.3-.9.9-.2 1.1l4.8 1.5 1.9 5.8c.2.7.1.9.8.9.4 0 .6-.2.9-.4l2.6-2.5 5.4 4c.6.4 1.1.2 1.2-.6l2.2-15.2c.2-1-.4-1.5-1.2-1.2Zm-3.2 3.1-8.7 8c-.2.2-.4.5-.3.8l.5 3.2-1.3-4.1 10.2-8.6c.4-.3.7.1.4.4l-.8.7Z" />
+      </svg>
+    );
+  }
+  if (id === "whatsapp") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path fill="currentColor" d="M12.04 2C6.58 2 2.15 6.4 2.15 11.83c0 1.74.46 3.44 1.34 4.94L2 22l5.39-1.41a10 10 0 0 0 4.65 1.18h.01c5.46 0 9.89-4.4 9.89-9.83C21.94 6.4 17.5 2 12.04 2Zm5.76 13.87c-.24.68-1.4 1.3-1.94 1.38-.5.07-1.12.1-1.81-.11-.41-.13-.95-.31-1.63-.61-2.87-1.24-4.74-4.13-4.88-4.32-.14-.19-1.16-1.54-1.16-2.94s.73-2.08 1-2.37c.26-.29.57-.36.76-.36h.55c.17 0 .41-.07.64.49.24.58.82 2 .89 2.15.07.14.12.31.02.5-.09.19-.14.31-.28.48-.14.17-.29.37-.42.5-.14.14-.28.29-.12.56.16.27.7 1.16 1.51 1.88 1.04.92 1.91 1.21 2.18 1.35.27.14.43.12.59-.07.16-.19.67-.78.85-1.05.18-.26.35-.22.59-.13.24.09 1.52.72 1.78.85.26.13.43.19.5.3.06.1.06.61-.18 1.29Z" />
+      </svg>
+    );
+  }
+  if (id === "max") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <text x="12" y="16" textAnchor="middle" fill="currentColor" fontSize="9" fontWeight="800" fontFamily="Arial, sans-serif">MAX</text>
+      </svg>
+    );
+  }
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path fill="currentColor" d="M3 5h18a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Zm9 7.2L4.2 6.6 3.2 8l8.8 6.2L20.8 8l-1-1.4L12 12.2Z" />
+    </svg>
+  );
 }
 
 export function CheckoutView() {
   const cart = useCart();
   const [name, setName] = useState("");
-  const [phoneDigits, setPhoneDigits] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [contact, setContact] = useState<Contact | "">("");
   const [delivery, setDelivery] = useState<Delivery>("cdek");
   const [city, setCity] = useState("");
   const [terminal, setTerminal] = useState("");
@@ -44,8 +77,12 @@ export function CheckoutView() {
     if (submitting || cart.items.length === 0) return;
     const next: Record<string, string> = {};
     const cleanName = name.trim().replace(/\s+/g, " ");
+    const cleanPhone = phone.trim().replace(/\s+/g, " ");
+    const cleanEmail = email.trim().toLowerCase();
     if (cleanName.split(" ").length < 2) next.name = "Укажите фамилию и имя";
-    if (phoneDigits.length !== 10) next.phone = "Укажите телефон полностью";
+    if (!phoneOk(cleanPhone)) next.phone = "Укажите телефон с кодом страны";
+    if (!emailOk(cleanEmail)) next.email = "Укажите почту";
+    if (!contact) next.contact = "Выберите, как с вами связаться";
     if (delivery === "cdek") {
       if (city.trim().length < 2) next.city = "Укажите город";
       if (terminal.trim().length < 5) next.terminal = "Укажите адрес пункта СДЭК";
@@ -67,7 +104,9 @@ export function CheckoutView() {
         signal: AbortSignal.timeout(20000),
         body: JSON.stringify({
           name: cleanName,
-          phone: `+7${phoneDigits}`,
+          phone: cleanPhone,
+          email: cleanEmail,
+          contact,
           delivery,
           city: delivery === "cdek" ? city.trim() : "",
           terminal: delivery === "cdek" ? terminal.trim() : "",
@@ -183,22 +222,45 @@ export function CheckoutView() {
             </label>
             <label>
               Телефон
-              <span className="checkout-phone">
-                <span className="china-flag" aria-hidden>
-                  <i />
-                  <i />
-                  <i />
-                </span>
-                <input
-                  value={formatRuPhone(phoneDigits)}
-                  onChange={(event) => setPhoneDigits(nationalDigits(event.target.value))}
-                  placeholder="+7 (000) 000-00-00"
-                  autoComplete="tel"
-                  inputMode="tel"
-                />
-              </span>
+              <input
+                value={phone}
+                onChange={(event) => setPhone(event.target.value.slice(0, 24))}
+                placeholder="+код страны и номер телефона"
+                autoComplete="tel"
+                inputMode="tel"
+              />
               {errors.phone ? <span className="checkout-error">{errors.phone}</span> : null}
             </label>
+            <label>
+              Email
+              <input
+                value={email}
+                onChange={(event) => setEmail(event.target.value.slice(0, 120))}
+                placeholder="name@mail.com"
+                autoComplete="email"
+                inputMode="email"
+              />
+              {errors.email ? <span className="checkout-error">{errors.email}</span> : null}
+            </label>
+            <fieldset className="contact-options">
+              <legend>Как с вами связаться</legend>
+              <div className="contact-grid">
+                {contactChoices.map((choice) => (
+                  <label key={choice.id} className={contact === choice.id ? "contact-option is-on" : "contact-option"}>
+                    <input
+                      type="radio"
+                      name="contact"
+                      value={choice.id}
+                      checked={contact === choice.id}
+                      onChange={() => setContact(choice.id)}
+                    />
+                    <ContactIcon id={choice.id} />
+                    <span>{choice.label}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.contact ? <span className="checkout-error">{errors.contact}</span> : null}
+            </fieldset>
             <fieldset className="delivery-options">
               <legend>Получение</legend>
               <label className={delivery === "cdek" ? "delivery-option is-on" : "delivery-option"}>
