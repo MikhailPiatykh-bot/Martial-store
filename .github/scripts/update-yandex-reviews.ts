@@ -1,5 +1,5 @@
 import { readFileSync, writeFileSync } from "fs";
-import { parseYandexReviewsHtml } from "../../lib/reviews.ts";
+import { parseYandexReviewsHtml } from "../../lib/yandexReviewsParse.ts";
 
 const page = "https://yandex.ru/maps/org/96913793575/reviews/";
 const file = new URL("../../data/yandex-reviews.json", import.meta.url);
