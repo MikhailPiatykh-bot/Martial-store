@@ -16,10 +16,13 @@ const contactChoices: { id: Contact; label: string }[] = [
   { id: "email", label: "Email" },
 ];
 
+function phoneBody(value: string) {
+  return value.replace(/\+/g, "").replace(/[^\d\s()-]/g, "").slice(0, 22);
+}
+
 function phoneOk(value: string) {
-  if (!value.startsWith("+")) return false;
   const digits = value.replace(/\D/g, "");
-  return digits.length >= 8 && digits.length <= 15 && /^\+[0-9][0-9\s()-]*$/.test(value);
+  return digits.length >= 8 && digits.length <= 15 && /^[0-9][0-9\s()-]*$/.test(value);
 }
 
 function emailOk(value: string) {
@@ -60,7 +63,7 @@ export function CheckoutView() {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
-  const [contact, setContact] = useState<Contact | "">("");
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [delivery, setDelivery] = useState<Delivery>("cdek");
   const [city, setCity] = useState("");
   const [terminal, setTerminal] = useState("");
@@ -82,7 +85,7 @@ export function CheckoutView() {
     if (cleanName.split(" ").length < 2) next.name = "Укажите фамилию и имя";
     if (!phoneOk(cleanPhone)) next.phone = "Укажите телефон с кодом страны";
     if (!emailOk(cleanEmail)) next.email = "Укажите почту";
-    if (!contact) next.contact = "Выберите, как с вами связаться";
+    if (contacts.length === 0) next.contact = "Выберите, как с вами связаться";
     if (delivery === "cdek") {
       if (city.trim().length < 2) next.city = "Укажите город";
       if (terminal.trim().length < 5) next.terminal = "Укажите адрес пункта СДЭК";
@@ -104,9 +107,9 @@ export function CheckoutView() {
         signal: AbortSignal.timeout(20000),
         body: JSON.stringify({
           name: cleanName,
-          phone: cleanPhone,
+          phone: `+${cleanPhone}`,
           email: cleanEmail,
-          contact,
+          contact: contacts,
           delivery,
           city: delivery === "cdek" ? city.trim() : "",
           terminal: delivery === "cdek" ? terminal.trim() : "",
@@ -222,13 +225,16 @@ export function CheckoutView() {
             </label>
             <label>
               Телефон
-              <input
-                value={phone}
-                onChange={(event) => setPhone(event.target.value.slice(0, 24))}
-                placeholder="+код страны и номер телефона"
-                autoComplete="tel"
-                inputMode="tel"
-              />
+              <span className="checkout-phone">
+                <span className="checkout-plus" aria-hidden>+</span>
+                <input
+                  value={phone}
+                  onChange={(event) => setPhone(phoneBody(event.target.value))}
+                  placeholder="код страны и номер телефона"
+                  autoComplete="tel"
+                  inputMode="tel"
+                />
+              </span>
               {errors.phone ? <span className="checkout-error">{errors.phone}</span> : null}
             </label>
             <label>
@@ -244,15 +250,16 @@ export function CheckoutView() {
             </label>
             <fieldset className="contact-options">
               <legend>Как с вами связаться</legend>
+              <p className="contact-note">Можно выбрать несколько</p>
               <div className="contact-grid">
                 {contactChoices.map((choice) => (
-                  <label key={choice.id} className={contact === choice.id ? "contact-option is-on" : "contact-option"}>
+                  <label key={choice.id} className={contacts.includes(choice.id) ? "contact-option is-on" : "contact-option"}>
                     <input
-                      type="radio"
+                      type="checkbox"
                       name="contact"
                       value={choice.id}
-                      checked={contact === choice.id}
-                      onChange={() => setContact(choice.id)}
+                      checked={contacts.includes(choice.id)}
+                      onChange={() => setContacts((current) => current.includes(choice.id) ? current.filter((item) => item !== choice.id) : [...current, choice.id])}
                     />
                     <ContactIcon id={choice.id} />
                     <span>{choice.label}</span>

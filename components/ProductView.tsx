@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/CartProvider";
 import { bazaEmbedSrc } from "@/lib/baza";
-import { categoryHref, editionChoiceLabel, editionLabel, priceLabel, type Edition, type Product } from "@/lib/catalog";
+import { COLOR_FILTER, COLOR_SWATCH, categoryHref, editionChoiceLabel, editionLabel, priceLabel, type Edition, type Product } from "@/lib/catalog";
 
 type Slide = { kind: "video" | "image"; src: string };
 
@@ -12,6 +12,18 @@ function choiceText(edition: Edition, editions: Edition[]) {
   const label = editionChoiceLabel(edition);
   const shared = editions.filter((item) => editionChoiceLabel(item) === label).length > 1;
   return shared ? editionLabel(edition) : label;
+}
+
+function optionValue(edition: Edition, name: string) {
+  return edition.options.find((option) => option.name === name)?.value;
+}
+
+const PLATE_COLORS = ["Красный", "Синий"];
+
+function plateColors(editions: Edition[]) {
+  const colors = editions.map((edition) => optionValue(edition, COLOR_FILTER));
+  if (!colors.length || colors.some((color) => !color || !PLATE_COLORS.includes(color))) return [];
+  return PLATE_COLORS.filter((color) => colors.includes(color));
 }
 
 function ProductText({ text }: { text: string }) {
@@ -86,10 +98,31 @@ export function ProductView({ product }: { product: Product }) {
   const swipe = useRef<{ x: number; y: number } | null>(null);
   useEffect(() => {
     setSlideIndex(0);
+    setEditionIndex(0);
   }, [product.path]);
   const edition = product.editions[editionIndex];
   const price = edition ? edition.price : product.price;
   const variant = edition ? editionLabel(edition) : "";
+  const colors = plateColors(product.editions);
+  const selectedColor = edition ? optionValue(edition, COLOR_FILTER) : undefined;
+  const sizeChoices = colors.length
+    ? product.editions
+        .map((item, index) => ({ item, index }))
+        .filter(({ item }) => optionValue(item, COLOR_FILTER) === selectedColor)
+    : product.editions.map((item, index) => ({ item, index }));
+
+  function selectColor(color: string) {
+    const size = edition ? editionChoiceLabel(edition) : "";
+    const sameSize = product.editions.findIndex(
+      (item) => optionValue(item, COLOR_FILTER) === color && editionChoiceLabel(item) === size,
+    );
+    if (sameSize >= 0) {
+      setEditionIndex(sameSize);
+      return;
+    }
+    const first = product.editions.findIndex((item) => optionValue(item, COLOR_FILTER) === color);
+    if (first >= 0) setEditionIndex(first);
+  }
   const slide = slides[slideIndex] ?? slides[0];
   const image = product.images[0] || "";
   const poster = product.images[0] || "";
@@ -154,13 +187,31 @@ export function ProductView({ product }: { product: Product }) {
         <h1>{product.title}</h1>
         {product.lead ? <p className="lede">{product.lead}</p> : null}
         <div className="price">{priceLabel(price)}</div>
-        {product.editions.length > 1 && (
+        {colors.length > 1 && (
+          <fieldset className="color-pick">
+            <legend>Выберите цвет</legend>
+            <div className="color-plates">
+              {colors.map((color) => (
+                <button
+                  key={color}
+                  type="button"
+                  className={color === selectedColor ? "color-plate is-on" : "color-plate"}
+                  style={{ backgroundColor: COLOR_SWATCH[color] }}
+                  aria-pressed={color === selectedColor}
+                  aria-label={color}
+                  onClick={() => selectColor(color)}
+                />
+              ))}
+            </div>
+          </fieldset>
+        )}
+        {sizeChoices.length > 1 && (
           <label>
             Вариант
             <select className="field" value={editionIndex} onChange={(event) => setEditionIndex(Number(event.target.value))}>
-              {product.editions.map((item, index) => (
+              {sizeChoices.map(({ item, index }) => (
                 <option key={`${editionLabel(item)}-${index}`} value={index}>
-                  {choiceText(item, product.editions)}
+                  {choiceText(item, sizeChoices.map(({ item: choice }) => choice))}
                 </option>
               ))}
             </select>

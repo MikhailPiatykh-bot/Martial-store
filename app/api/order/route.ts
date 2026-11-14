@@ -26,12 +26,18 @@ const contactLabels = {
 type Contact = keyof typeof contactLabels;
 
 function internationalPhone(value: string) {
-  const phone = value.trim().replace(/\s+/g, " ");
-  if (phone.length > 24 || !phone.startsWith("+")) return "";
+  let phone = value.trim().replace(/\s+/g, " ").replace(/\+/g, "");
+  phone = `+${phone}`;
+  if (phone.length > 24) return "";
   const digits = phone.replace(/\D/g, "");
   if (digits.length < 8 || digits.length > 15) return "";
   if (!/^\+[0-9][0-9\s()-]*$/.test(phone)) return "";
   return phone;
+}
+
+function cleanContacts(value: unknown) {
+  const raw = Array.isArray(value) ? value : typeof value === "string" ? [value] : [];
+  return (Object.keys(contactLabels) as Contact[]).filter((id) => raw.includes(id));
 }
 
 function cleanEmail(value: string) {
@@ -193,7 +199,7 @@ export async function POST(request: Request) {
   const name = typeof body.name === "string" ? body.name.trim().replace(/\s+/g, " ") : "";
   const phone = typeof body.phone === "string" ? internationalPhone(body.phone) : "";
   const email = typeof body.email === "string" ? cleanEmail(body.email) : "";
-  const contact = typeof body.contact === "string" && body.contact in contactLabels ? (body.contact as Contact) : "";
+  const contacts = cleanContacts(body.contact);
   const delivery = body.delivery === "cdek" || body.delivery === "pickup" ? body.delivery : "";
   const city = typeof body.city === "string" ? body.city.trim().replace(/\s+/g, " ") : "";
   const terminal = typeof body.terminal === "string" ? body.terminal.trim().replace(/\s+/g, " ") : "";
@@ -204,7 +210,7 @@ export async function POST(request: Request) {
   const nameOk = name.split(" ").length >= 2 && name.length <= 120;
   const phoneOk = phone.length > 0;
   const emailOk = email.length > 0;
-  const contactOk = contact !== "";
+  const contactOk = contacts.length > 0;
   const deliveryOk = delivery === "pickup" || (delivery === "cdek" && city.length >= 2 && city.length <= 80 && terminal.length >= 5 && terminal.length <= 200);
   const commentOk = comment.length <= 800;
   const linesOk = lines.length > 0 && lines.every((line): line is Line => line !== null);
@@ -225,13 +231,14 @@ export async function POST(request: Request) {
     })
     .join("\n");
 
+  const contactText = contacts.map((id) => contactLabels[id]).join(", ");
   const text = orderMessage({
     id,
     total,
     name,
     phone,
     email,
-    contact: contactLabels[contact],
+    contact: contactText,
     delivery,
     city,
     terminal,
@@ -261,13 +268,13 @@ export async function POST(request: Request) {
   }
 
   if (telegramSent) {
-    void sendEmail(request, id, total, name, phone, email, contactLabels[contact], delivery, city, terminal, comment, composition).catch(() => undefined);
+    void sendEmail(request, id, total, name, phone, email, contactText, delivery, city, terminal, comment, composition).catch(() => undefined);
     return NextResponse.json({ ok: true, id, total });
   }
 
   let mailed: "ok" | "failed" | "activation" = "failed";
   try {
-    mailed = await sendEmail(request, id, total, name, phone, email, contactLabels[contact], delivery, city, terminal, comment, composition);
+    mailed = await sendEmail(request, id, total, name, phone, email, contactText, delivery, city, terminal, comment, composition);
   } catch (error) {
     console.error("order email failed", error instanceof Error ? error.name : "error");
     mailed = "failed";

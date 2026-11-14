@@ -68,6 +68,8 @@ const categoryImages: Record<string, string> = {
   "Ковры/помосты/львы": "/catalog/kovry.jpg",
   "Чехлы": "/catalog/chehly.jpg",
   "Саньда": "/catalog/sanda.jpg",
+  "Шуайцзяо": "/catalog/shuaytszyao.jpg",
+  "Дуаньбин": "/catalog/duanbin.jpg",
 };
 
 export function categoryImage(title: string) {
