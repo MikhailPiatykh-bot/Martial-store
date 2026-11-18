@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CardImage } from "@/components/CardImage";
 import { ReviewsRail } from "@/components/ReviewsRail";
 import { categories, categoryHref, categoryImage, priceLabel } from "@/lib/catalog";
 import { SALE_CATEGORY, rasprodazhaCards } from "@/lib/rasprodazha";
@@ -38,7 +39,7 @@ export default async function HomePage() {
               {sale.map((card) => (
                 <Link key={card.path} href={card.path} className="card">
                   <span className="card-media">
-                    {card.image ? <img src={card.image} alt="" /> : <span className="ph" />}
+                    <CardImage src={card.image} />
                   </span>
                   <div>
                     <small>{card.categories.join(" · ")}</small>
