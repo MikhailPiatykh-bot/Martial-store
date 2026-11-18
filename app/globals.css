@@ -1094,6 +1094,7 @@ select.field, .field {
   margin-top: 8px;
   border: 1px solid rgba(246, 241, 232, 0.28);
 }
+.qty button:disabled { opacity: 0.45; cursor: not-allowed; }
 .qty button {
   width: 28px;
   height: 28px;
@@ -1770,6 +1771,12 @@ select.field, .field {
   color: var(--ink);
 }
 .checkout-error { color: #f0070b; font-size: 13px; }
+.checkout-pending { margin: 0; color: var(--ink); font-size: 14px; }
+.checkout-form.is-busy input,
+.checkout-form.is-busy textarea,
+.checkout-form.is-busy .contact-option,
+.checkout-form.is-busy .delivery-option,
+.checkout-form.is-busy .checkout-consent { pointer-events: none; }
 .checkout-hint { color: var(--red-hot); font-size: 13px; }
 .delivery-options {
   margin: 0;

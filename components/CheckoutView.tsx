@@ -29,6 +29,20 @@ function emailOk(value: string) {
   return value.length <= 120 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(value);
 }
 
+function checkoutKey() {
+  const cryptoApi = globalThis.crypto;
+  if (cryptoApi && typeof cryptoApi.randomUUID === "function") return cryptoApi.randomUUID();
+  return `order-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 12)}`;
+}
+
+function sendFailed(error: unknown) {
+  const name = error instanceof Error ? error.name : "";
+  if (name === "TimeoutError" || name === "AbortError") {
+    return "Ответ не пришёл вовремя. Нажмите «Заказать» ещё раз: если заказ уже создан, откроется тот же номер.";
+  }
+  return "Не удалось отправить заказ. Нажмите «Заказать» ещё раз — повтор не создаст второй заказ.";
+}
+
 function ContactIcon({ id }: { id: Contact }) {
   if (id === "telegram") {
     return (
@@ -73,11 +87,13 @@ export function CheckoutView() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const started = useRef(Date.now());
+  const submitLock = useRef(false);
+  const idempotencyKey = useRef(checkoutKey());
   const [done, setDone] = useState<{ id: string; total: number } | null>(null);
 
   async function submit(event: React.FormEvent) {
     event.preventDefault();
-    if (submitting || cart.items.length === 0) return;
+    if (submitLock.current || submitting || cart.items.length === 0) return;
     const next: Record<string, string> = {};
     const cleanName = name.trim().replace(/\s+/g, " ");
     const cleanPhone = phone.trim().replace(/\s+/g, " ");
@@ -99,6 +115,8 @@ export function CheckoutView() {
       return;
     }
 
+    submitLock.current = true;
+    setErrors({});
     setSubmitting(true);
     try {
       const response = await fetch("/api/order", {
@@ -117,6 +135,7 @@ export function CheckoutView() {
           consent: true,
           company,
           started: started.current,
+          idempotencyKey: idempotencyKey.current,
           items: cart.items.map((item) => ({
             path: item.path,
             variant: item.variant,
@@ -126,7 +145,7 @@ export function CheckoutView() {
       });
       const data = (await response.json().catch(() => ({}))) as { error?: string; id?: string; total?: number };
       if (!response.ok || !data.id || typeof data.total !== "number") {
-        setErrors({ form: data.error || "Не удалось отправить заказ. Попробуйте ещё раз." });
+        setErrors({ form: data.error || sendFailed(new Error("failed")) });
         requestAnimationFrame(() => {
           document.querySelector(".checkout-alert")?.scrollIntoView({ block: "center" });
         });
@@ -134,9 +153,13 @@ export function CheckoutView() {
       }
       setDone({ id: data.id, total: data.total });
       cart.clear();
-    } catch {
-      setErrors({ form: "Не удалось отправить заказ. Попробуйте ещё раз." });
+    } catch (error) {
+      setErrors({ form: sendFailed(error) });
+      requestAnimationFrame(() => {
+        document.querySelector(".checkout-alert")?.scrollIntoView({ block: "center" });
+      });
     } finally {
+      submitLock.current = false;
       setSubmitting(false);
     }
   }
@@ -155,10 +178,11 @@ export function CheckoutView() {
     return (
       <section className="section checkout">
         <div className="wrap checkout-done">
-          <p className="kicker">Заказ {done.id}</p>
-          <h1>Заказ принят</h1>
+          <p className="kicker">Заказ принят</p>
+          <h1>Номер {done.id}</h1>
           <p>
-            Сумма {formatPrice(done.total)}. Мы проверим наличие и свяжемся с вами: менеджер подтвердит заказ и способ оплаты. На сайте оплата не принимается, в том числе банковской картой.
+            Сумма {formatPrice(done.total)}. Корзина очищена, повторно отправлять этот заказ не нужно.
+            Мы проверим наличие и свяжемся с вами: менеджер подтвердит заказ и способ оплаты. На сайте оплата не принимается, в том числе банковской картой.
             Отправка в СДЭК — по вторникам и четвергам.
           </p>
           <p>
@@ -211,7 +235,7 @@ export function CheckoutView() {
           После заявки мы проверим склад и свяжемся с вами. Менеджер подтвердит заказ и способ оплаты: наличный или безналичный расчёт. Оплата на сайте не принимается, в том числе банковской картой.
         </p>
         <div className="checkout-grid">
-          <form className="checkout-form" onSubmit={submit} noValidate>
+          <form className={submitting ? "checkout-form is-busy" : "checkout-form"} onSubmit={submit} noValidate aria-busy={submitting}>
             {errors.form ? <p className="checkout-error">{errors.form}</p> : null}
             <label>
               ФИО получателя
@@ -349,8 +373,9 @@ export function CheckoutView() {
               <input tabIndex={-1} autoComplete="off" value={company} onChange={(event) => setCompany(event.target.value)} />
             </div>
             {errors.consent ? <span className="checkout-error">{errors.consent}</span> : null}
-            {errors.form ? <p className="checkout-error checkout-alert">{errors.form}</p> : Object.keys(errors).length > 0 ? <p className="checkout-error checkout-alert">Проверьте поля выше: без них заказ не отправится.</p> : null}
-            <button className="btn red" type="submit" disabled={submitting}>
+            {errors.form ? <p className="checkout-error checkout-alert" role="alert">{errors.form}</p> : Object.keys(errors).length > 0 ? <p className="checkout-error checkout-alert" role="alert">Проверьте поля выше: без них заказ не отправится.</p> : null}
+            {submitting ? <p className="checkout-pending" role="status">Отправляем заказ… Кнопка заблокирована, подождите.</p> : null}
+            <button className="btn red" type="submit" disabled={submitting} aria-busy={submitting}>
               {submitting ? "Отправляем…" : `Заказать на ${formatPrice(cart.total)}`}
             </button>
           </form>
@@ -364,9 +389,9 @@ export function CheckoutView() {
                     <Link href={item.path}>{item.title}</Link>
                     <small>{item.variant || "Базовый вариант"}</small>
                     <div className="qty">
-                      <button type="button" aria-label="Уменьшить количество" onClick={() => cart.setQty(item.path, item.variant, item.qty - 1)}>−</button>
+                      <button type="button" aria-label="Уменьшить количество" disabled={submitting} onClick={() => cart.setQty(item.path, item.variant, item.qty - 1)}>−</button>
                       <span>{item.qty}</span>
-                      <button type="button" aria-label="Увеличить количество" onClick={() => cart.setQty(item.path, item.variant, item.qty + 1)}>+</button>
+                      <button type="button" aria-label="Увеличить количество" disabled={submitting} onClick={() => cart.setQty(item.path, item.variant, item.qty + 1)}>+</button>
                     </div>
                   </div>
                   <strong>{formatPrice(item.price * item.qty)}</strong>
