@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { CardImage } from "@/components/CardImage";
 import {
   CLOTHES_FILTER,
   COLOR_FILTER,
@@ -121,6 +122,9 @@ export function CatalogView({
 
   const filtersOn = pickedColors.length > 0 || pickedClothes.length > 0 || pickedShoes.length > 0;
   const allImage = categoryImage("Все товары");
+  // The category photo wall fills the first screen, so product cards there stay lazy.
+  // On a section page the first row can sit under the header: preload at most four.
+  const priorityCount = showCategories && !activeCategory ? 0 : 4;
 
   return (
     <div className="wrap">
@@ -242,10 +246,10 @@ export function CatalogView({
             <p>В этом разделе ничего не нашлось. Измените фильтры или сбросьте поиск.</p>
           ) : (
             <div className="grid">
-              {visible.map((card) => (
+              {visible.map((card, index) => (
                 <Link key={card.path} href={card.path} className="card">
                   <span className="card-media">
-                    {card.image ? <img src={card.image} alt="" /> : <span className="ph" />}
+                    <CardImage src={card.image} priority={index < priorityCount} />
                   </span>
                   <div>
                     <small>{card.categories.join(" · ")}</small>
