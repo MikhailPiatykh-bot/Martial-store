@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { editionLabel, formatPrice, products } from "@/lib/catalog";
 import { formsRecipient, rejectFlood, rejectSpam } from "@/lib/formGuard";
+import { cleanIdempotencyKey, findRecentOrder, orderFingerprint, rememberOrder } from "@/lib/orderLedger";
 import { enqueueTelegram } from "@/lib/telegramOutbox";
 
 type IncomingItem = {
@@ -10,6 +11,7 @@ type IncomingItem = {
 };
 
 type Line = {
+  path: string;
   title: string;
   variant: string;
   qty: number;
@@ -55,11 +57,11 @@ function resolveLine(item: IncomingItem): Line | null {
   if (!product.editions.length) {
     if (item.variant !== "") return null;
     if (!(product.price > 0)) return null;
-    return { title: product.title, variant: "", qty, price: product.price };
+    return { path: product.path, title: product.title, variant: "", qty, price: product.price };
   }
   const edition = product.editions.find((entry) => editionLabel(entry) === item.variant);
   if (!edition || !(edition.price > 0)) return null;
-  return { title: product.title, variant: item.variant, qty, price: edition.price };
+  return { path: product.path, title: product.title, variant: item.variant, qty, price: edition.price };
 }
 
 function orderId() {
@@ -100,20 +102,6 @@ function orderMessage(order: {
   lines.push("", order.composition);
   if (order.comment) lines.push("", `Комментарий: ${order.comment}`);
   return lines.join("\n").slice(0, 4000);
-}
-
-async function sendTelegram(token: string, chatId: string, text: string) {
-  const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text }),
-    signal: AbortSignal.timeout(12000),
-  });
-  const payload = (await response.json().catch(() => null)) as { ok?: boolean; description?: string } | null;
-  if (response.ok && payload?.ok === true) return true;
-  const description = typeof payload?.description === "string" ? payload.description.slice(0, 180) : "";
-  console.error("order telegram response", response.status, description);
-  return false;
 }
 
 async function sendEmail(
@@ -186,6 +174,7 @@ export async function POST(request: Request) {
     items?: unknown;
     company?: unknown;
     started?: unknown;
+    idempotencyKey?: unknown;
   };
   try {
     body = await request.json();
@@ -219,12 +208,21 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Проверьте данные получателя и состав заказа." }, { status: 400 });
   }
 
+  const readyLines = lines.filter((line): line is Line => line !== null);
+  const idempotencyKey = cleanIdempotencyKey(body.idempotencyKey);
+  const fingerprint = orderFingerprint(phone, readyLines);
+  const existing = findRecentOrder(idempotencyKey, fingerprint);
+  if (existing) {
+    console.info("order repeat", existing.id);
+    return NextResponse.json({ ok: true, id: existing.id, total: existing.total });
+  }
+
   const flood = rejectFlood(request);
   if (flood) return flood;
 
-  const total = lines.reduce((sum, line) => sum + line.price * line.qty, 0);
+  const total = readyLines.reduce((sum, line) => sum + line.price * line.qty, 0);
   const id = orderId();
-  const composition = lines
+  const composition = readyLines
     .map((line, index) => {
       const variant = line.variant ? ` (${line.variant})` : "";
       return `${index + 1}. ${line.title}${variant} × ${line.qty} — ${formatPrice(line.price * line.qty)}`;
@@ -248,27 +246,28 @@ export async function POST(request: Request) {
 
   const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
   const chatId = process.env.TELEGRAM_CHAT_ID?.trim();
-  let telegramSent = false;
+  // The shop host cannot reach api.telegram.org, so a synchronous send waits out
+  // its 12s timeout and the buyer submits again. Hand the same message to the
+  // outbox and answer immediately; the existing worker delivers it.
   if (token && chatId) {
-    try {
-      telegramSent = await sendTelegram(token, chatId, text);
-      if (!telegramSent) console.error("order telegram declined", id);
-    } catch (error) {
-      console.error("order telegram failed", error instanceof Error ? error.name : "error");
-      telegramSent = false;
-    }
-  }
-
-  if (!telegramSent && token && chatId) {
     try {
       enqueueTelegram(id, text);
     } catch (error) {
       console.error("order telegram queue failed", error instanceof Error ? error.name : "error");
+      return NextResponse.json(
+        { error: "Не удалось записать заказ. Нажмите «Заказать» ещё раз — повтор не создаст второй заказ." },
+        { status: 502 },
+      );
     }
-  }
-
-  if (telegramSent) {
-    void sendEmail(request, id, total, name, phone, email, contactText, delivery, city, terminal, comment, composition).catch(() => undefined);
+    try {
+      rememberOrder({ key: idempotencyKey, fingerprint, id, total, at: Date.now() });
+    } catch (error) {
+      console.error("order ledger failed", error instanceof Error ? error.name : "error");
+    }
+    void sendEmail(request, id, total, name, phone, email, contactText, delivery, city, terminal, comment, composition).catch((error) => {
+      console.error("order email failed", error instanceof Error ? error.name : "error");
+    });
+    console.info("order accepted", id);
     return NextResponse.json({ ok: true, id, total });
   }
 
@@ -279,7 +278,10 @@ export async function POST(request: Request) {
     console.error("order email failed", error instanceof Error ? error.name : "error");
     mailed = "failed";
   }
-  if (mailed === "ok") return NextResponse.json({ ok: true, id, total });
+  if (mailed === "ok") {
+    rememberOrder({ key: idempotencyKey, fingerprint, id, total, at: Date.now() });
+    return NextResponse.json({ ok: true, id, total });
+  }
   if (mailed === "activation") {
     return NextResponse.json(
       {
@@ -289,5 +291,8 @@ export async function POST(request: Request) {
       { status: 409 },
     );
   }
-  return NextResponse.json({ error: "Не удалось отправить заказ. Попробуйте ещё раз." }, { status: 502 });
+  return NextResponse.json(
+    { error: "Не удалось записать заказ. Нажмите «Заказать» ещё раз — повтор не создаст второй заказ." },
+    { status: 502 },
+  );
 }
