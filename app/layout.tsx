@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { CartProvider } from "@/components/CartProvider";
 import { SiteChrome } from "@/components/SiteChrome";
 import { YandexMetrika } from "@/components/YandexMetrika";
+import { YandexMetrikaClicks, YandexMetrikaHit } from "@/components/YandexMetrikaTracker";
 import "./globals.css";
 
 const sans = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-sans" });
@@ -23,8 +24,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartProvider>
           <SiteChrome>{children}</SiteChrome>
         </CartProvider>
+        <YandexMetrika />
+        <YandexMetrikaClicks />
         <Suspense fallback={null}>
-          <YandexMetrika />
+          <YandexMetrikaHit />
         </Suspense>
       </body>
     </html>

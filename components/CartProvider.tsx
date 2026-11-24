@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { reachGoal } from "@/lib/metrika";
 
 export type CartItem = {
   path: string;
@@ -74,6 +75,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           );
         });
         setOpen(true);
+        reachGoal("add_to_cart");
       },
       setQty: (path, variant, qty) => {
         setItems((current) => {

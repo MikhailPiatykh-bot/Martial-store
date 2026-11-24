@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/CartProvider";
 import { formatPrice } from "@/lib/catalog";
+import { reachGoal, reachOrderSubmit } from "@/lib/metrika";
 import { site } from "@/lib/site";
 
 type Delivery = "cdek" | "pickup";
@@ -91,6 +92,13 @@ export function CheckoutView() {
   const idempotencyKey = useRef(checkoutKey());
   const [done, setDone] = useState<{ id: string; total: number } | null>(null);
 
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      reachGoal("checkout_open");
+    }, 0);
+    return () => window.clearTimeout(timer);
+  }, []);
+
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (submitLock.current || submitting || cart.items.length === 0) return;
@@ -151,6 +159,7 @@ export function CheckoutView() {
         });
         return;
       }
+      reachOrderSubmit(data.id, data.total);
       setDone({ id: data.id, total: data.total });
       cart.clear();
     } catch (error) {
