@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { CardImage } from "@/components/CardImage";
+import { SiteImage } from "@/components/SiteImage";
 import {
   CLOTHES_FILTER,
   COLOR_FILTER,
@@ -148,7 +149,7 @@ export function CatalogView({
       ) : (
         <div className="cats" style={{ marginBottom: 18 }}>
           <Link className={allImage ? "cat has-photo" : "cat"} href="/catalog" aria-current="page">
-            {allImage ? <img src={allImage} alt="" /> : null}
+            {allImage ? <SiteImage src={allImage} alt="" width={640} height={640} sizes="(max-width: 700px) 46vw, 220px" /> : null}
             <span>Все товары</span>
           </Link>
           {categories.map((category) => {
@@ -159,7 +160,7 @@ export function CatalogView({
                 className={image ? "cat has-photo" : "cat"}
                 href={categoryHref(category.title)}
               >
-                {image ? <img src={image} alt="" /> : null}
+                {image ? <SiteImage src={image} alt="" width={640} height={640} sizes="(max-width: 700px) 46vw, 220px" /> : null}
                 <span>{category.title}</span>
               </Link>
             );

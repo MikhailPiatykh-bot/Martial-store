@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Article } from "@/components/Article";
+import { SiteImage } from "@/components/SiteImage";
 import { categoryHref } from "@/lib/catalog";
 
 export const metadata: Metadata = {
@@ -80,12 +81,12 @@ export default function TournamentPage() {
 
       <h2>Дисциплины</h2>
       <h3>Технические комплексы</h3>
-      <img className="kaishi-photo" src="/kaishi/tech.jpg" alt="Выступление с мечами и веерами на турнире «Кайши»" />
+      <SiteImage className="kaishi-photo" src="/kaishi/tech.jpg" alt="Выступление с мечами и веерами на турнире «Кайши»" width={711} height={400} sizes="(max-width: 800px) 100vw, 760px" />
       <p>
         Та же развилка программ: на фестивале медаль и диплом с баллами без мест, на турнире — только призовые места.
       </p>
       <h3>Бои на макетах оружия</h3>
-      <img className="kaishi-photo" src="/kaishi/weapons.jpg" alt="Бой на макетах оружия на турнире «Кайши»" />
+      <SiteImage className="kaishi-photo" src="/kaishi/weapons.jpg" alt="Бой на макетах оружия на турнире «Кайши»" width={600} height={400} sizes="(max-width: 800px) 100vw, 760px" />
       <p>
         Поединок идёт до первого результативного действия и не дольше минуты. Если в группе два или три участника,
         лимит тоже одна минута. Попадание в конечность — 1 балл, в корпус — 2, по голове — 3, потеря оружия соперником — 3.
@@ -93,7 +94,7 @@ export default function TournamentPage() {
         метание макета и удары по суставам.
       </p>
       <h3>Туйшоу на месте</h3>
-      <img className="kaishi-photo" src="/kaishi/tuishou.jpg" alt="Туйшоу на турнире «Кайши»" />
+      <SiteImage className="kaishi-photo" src="/kaishi/tuishou.jpg" alt="Туйшоу на турнире «Кайши»" width={600} height={400} sizes="(max-width: 800px) 100vw, 760px" />
       <p>
         Поединок идёт до первого результативного действия: сдвиг одной ноги — 1 балл, двух ног — 2, касание третьей
         точкой опоры — 3. Запрещены действия в шею и голову, удары ниже пояса, захваты закрытыми пальцами
@@ -103,7 +104,7 @@ export default function TournamentPage() {
         В боях на макетах и в туйшоу первое замечание — минус 1 балл, второе — минус 2, третье — дисквалификация в дисциплине.
       </p>
       <h3>Лайт-контакт</h3>
-      <img className="kaishi-photo" src="/kaishi/light.jpg" alt="Поединок лайт-контакт на турнире «Кайши»" />
+      <SiteImage className="kaishi-photo" src="/kaishi/light.jpg" alt="Поединок лайт-контакт на турнире «Кайши»" width={600} height={400} sizes="(max-width: 800px) 100vw, 760px" />
       <p>
         Поединок состоит из трёх раундов с перерывами. До 14 лет раунд длится 1 минуту, в старших группах — 2 минуты.
         Нужны боксёрский шлем с зашитым пластиковым забралом не сплошной конструкции, перчатки, капа, раковина,

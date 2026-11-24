@@ -3,23 +3,22 @@
 import { useEffect, useRef, useState } from "react";
 
 export function CountUp({ to }: { to: number }) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(to);
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const node = ref.current;
     if (!node) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const visible = node.getBoundingClientRect();
+    if (visible.bottom > 0 && visible.top < window.innerHeight) return;
+
     let frame = 0;
     let started = false;
-
     const finish = () => {
       if (started) return;
       started = true;
-      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (reduced) {
-        setValue(to);
-        return;
-      }
+      setValue(0);
       const start = performance.now();
       const duration = 1800;
       const tick = (now: number) => {

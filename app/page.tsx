@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CardImage } from "@/components/CardImage";
 import { ReviewsRail } from "@/components/ReviewsRail";
+import { SiteImage } from "@/components/SiteImage";
 import { categories, categoryHref, categoryImage, priceLabel } from "@/lib/catalog";
 import { SALE_CATEGORY, rasprodazhaCards } from "@/lib/rasprodazha";
 import { loadYandexReviews, reviewsLabel, yandexReviewsUrl } from "@/lib/reviews";
@@ -61,7 +62,7 @@ export default async function HomePage() {
               const image = categoryImage(category.title);
               return (
                 <Link key={category.uid} className={image ? "cat has-photo" : "cat"} href={categoryHref(category.title)}>
-                  {image ? <img src={image} alt="" /> : null}
+                  {image ? <SiteImage src={image} alt="" width={640} height={640} sizes="(max-width: 700px) 46vw, 220px" /> : null}
                   <span>{category.title}</span>
                 </Link>
               );

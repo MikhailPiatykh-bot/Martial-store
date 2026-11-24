@@ -1,6 +1,7 @@
 "use client";
 
 import { useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { SiteImage } from "@/components/SiteImage";
 
 export function ChinaMaster({ children }: { children: ReactNode }) {
   const photoRef = useRef<HTMLDivElement>(null);
@@ -20,7 +21,13 @@ export function ChinaMaster({ children }: { children: ReactNode }) {
   return (
     <div className="china-master">
       <div className="china-master-photo" ref={photoRef}>
-        <img src="/wuway/master.jpg" alt="Мастер Лю Ляньцзюнь со сборной Martial Store" />
+        <SiteImage
+          src="/wuway/master.jpg"
+          alt="Мастер Лю Ляньцзюнь со сборной Martial Store"
+          width={1024}
+          height={771}
+          sizes="(max-width: 800px) 100vw, 480px"
+        />
       </div>
       <div className={open ? "china-master-copy is-open" : "china-master-copy"} style={!open && photoHeight ? { height: photoHeight } : undefined}>
         <div>{children}</div>

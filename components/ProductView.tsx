@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/CartProvider";
+import { SiteImage } from "@/components/SiteImage";
 import { bazaEmbedSrc } from "@/lib/baza";
 import { COLOR_FILTER, COLOR_SWATCH, categoryHref, editionChoiceLabel, editionLabel, priceLabel, type Edition, type Product } from "@/lib/catalog";
 
@@ -154,7 +155,15 @@ export function ProductView({ product }: { product: Product }) {
           {slide?.kind === "video" ? (
             <VideoSlide src={slide.src} title={`Видео: ${product.title}`} />
           ) : slide?.kind === "image" ? (
-            <img src={slide.src} alt={product.title} draggable={false} />
+            <SiteImage
+              src={slide.src}
+              alt={product.title}
+              width={1200}
+              height={1200}
+              sizes="(max-width: 900px) 100vw, 600px"
+              priority={slideIndex === 0}
+              draggable={false}
+            />
           ) : (
             <div className="ph" />
           )}
@@ -171,11 +180,11 @@ export function ProductView({ product }: { product: Product }) {
               >
                 {item.kind === "video" ? (
                   <span className="thumb-play">
-                    {poster ? <img src={poster} alt="" /> : <span className="ph" />}
+                    {poster ? <SiteImage src={poster} alt="" width={256} height={256} sizes="72px" /> : <span className="ph" />}
                     <span aria-hidden="true" />
                   </span>
                 ) : (
-                  <img src={item.src} alt="" />
+                  <SiteImage src={item.src} alt="" width={256} height={256} sizes="72px" />
                 )}
               </button>
             ))}

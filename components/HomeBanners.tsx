@@ -2,8 +2,9 @@
 
 import Link from "next/link";
 import { Fragment, useEffect, useState } from "react";
+import { SiteImage } from "@/components/SiteImage";
 
-type BrandLogo = { src: string; alt: string };
+type BrandLogo = { src: string; alt: string; width: number; height: number };
 
 type Slide = {
   kicker: string;
@@ -21,10 +22,10 @@ type Slide = {
 };
 
 const brandLogos: BrandLogo[] = [
-  { src: "/brand/ccwushu.png", alt: "CC Wushu" },
-  { src: "/brand/feiyue.png", alt: "Feiyue" },
-  { src: "/brand/budosaga.png", alt: "Budosaga" },
-  { src: "/brand/wesing.png", alt: "Wesing" },
+  { src: "/brand/ccwushu.png", alt: "CC Wushu", width: 172, height: 140 },
+  { src: "/brand/feiyue.png", alt: "Feiyue", width: 556, height: 139 },
+  { src: "/brand/budosaga.png", alt: "Budosaga", width: 400, height: 146 },
+  { src: "/brand/wesing.png", alt: "Wesing", width: 556, height: 370 },
 ];
 
 const slides: Slide[] = [
@@ -46,7 +47,7 @@ const slides: Slide[] = [
     cta: "Перейти в телеграм-канал",
     href: "https://t.me/martialstorerus",
     external: true,
-    float: "/brand/telegram-float.png",
+    float: "/brand/telegram-float.webp",
   },
   {
     kicker: "",
@@ -66,7 +67,7 @@ const slides: Slide[] = [
     cta: "Подробнее",
     href: "/tournament",
     external: false,
-    photo: "/brand/cooperation-group.png?v=3",
+    photo: "/brand/cooperation-group.png",
   },
   {
     kicker: "",
@@ -76,7 +77,7 @@ const slides: Slide[] = [
     cta: "",
     href: "",
     external: false,
-    logo: "/brand/pak-seal-round.png",
+    logo: "/brand/pak-seal-round.webp",
   },
 ];
 
@@ -169,7 +170,7 @@ export function HomeBanners() {
                     )
                   ) : null}
                 </div>
-                {item.logos ? (
+                {active && item.logos ? (
                   <div className="banner-visual logo-wall" aria-hidden="true">
                     <ul>
                       {Array.from({ length: 24 }, (_, logoIndex) => {
@@ -177,28 +178,48 @@ export function HomeBanners() {
                         if (!logo) return null;
                         return (
                           <li key={logoIndex}>
-                            <img src={logo.src} alt="" />
+                            <SiteImage
+                              src={logo.src}
+                              alt=""
+                              width={logo.width}
+                              height={logo.height}
+                              sizes="168px"
+                              eager={itemIndex === 0 && logoIndex < 4}
+                            />
                           </li>
                         );
                       })}
                     </ul>
                   </div>
-                ) : item.float ? (
+                ) : active && item.float ? (
                   <div className="banner-visual banner-float" aria-hidden="true">
-                    <img src={item.float} alt="" />
+                    <SiteImage src={item.float} alt="" width={440} height={440} sizes="220px" />
                   </div>
-                ) : item.athlete ? (
+                ) : active && item.athlete ? (
                   <div className="banner-visual banner-athlete" aria-hidden="true">
-                    <img src={item.athlete} alt="" />
+                    <SiteImage src={item.athlete} alt="" width={659} height={461} sizes="(max-width: 640px) 190px, 400px" />
                   </div>
-                ) : item.photo ? (
+                ) : active && item.photo ? (
                   <div className="banner-visual banner-partners">
-                    <img src={item.photo} alt="Спортсмены Martial Store в форме для ушу" />
+                    <SiteImage
+                      src={item.photo}
+                      alt="Спортсмены Martial Store в форме для ушу"
+                      width={636}
+                      height={846}
+                      sizes="(max-width: 640px) 220px, 240px"
+                    />
                   </div>
                 ) : (
                   <div className={item.logo ? "banner-visual has-logo" : "banner-visual"} aria-hidden={item.logo ? undefined : true}>
-                    {item.logo ? (
-                      <img className="banner-logo" src={item.logo} alt="Логотип Профессионального Альянса Ушу и Кунгфу" />
+                    {active && item.logo ? (
+                      <SiteImage
+                        className="banner-logo"
+                        src={item.logo}
+                        alt="Логотип Профессионального Альянса Ушу и Кунгфу"
+                        width={560}
+                        height={560}
+                        sizes="280px"
+                      />
                     ) : null}
                   </div>
                 )}
