@@ -1,6 +1,8 @@
 import { products, toCard, type ProductCard } from "@/lib/catalog";
 
 const novinkiSlugs = [
+  "618988042-704918263501-sportivnaya-futbolka-golubaya",
+  "618988042-704918263502-sportivnaya-futbolka-rozovaya",
   "618988042-508213954023-nunchaka-sorevnovatelnaya",
   "618988042-609352718408-nunchaka-uchebnaya-krasnaya",
   "618988042-710463829519-nunchaka-uchebnaya-chernaya",
