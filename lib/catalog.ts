@@ -10,6 +10,7 @@ export type Product = {
   slug: string;
   path: string;
   title: string;
+  seoTitle?: string;
   sku: string;
   price: number;
   lead: string;
