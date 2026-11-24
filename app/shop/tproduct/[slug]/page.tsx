@@ -16,11 +16,12 @@ export async function generateMetadata({
   const product = productBySlug(slug);
   if (!product) return { title: { absolute: "Товар не найден" } };
   const description = product.lead || product.text.slice(0, 180);
+  const pageTitle = product.seoTitle ?? `${product.title} — купить в Martial Store`;
   return {
-    title: { absolute: product.title },
+    title: { absolute: pageTitle },
     description,
     alternates: { canonical: product.path },
-    openGraph: { title: product.title, description, images: product.images.slice(0, 1) },
+    openGraph: { title: pageTitle, description, images: product.images.slice(0, 1) },
   };
 }
 
