@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductView } from "@/components/ProductView";
 import { productBySlug, products } from "@/lib/catalog";
+import { publicImageSize } from "@/lib/imageSize";
 import { productSeo } from "@/lib/seo";
 
 export function generateStaticParams() {
@@ -17,11 +18,29 @@ export async function generateMetadata({
   const product = productBySlug(slug);
   if (!product) return { title: { absolute: "Товар не найден" } };
   const { title, description } = productSeo(product);
+  const image = product.images[0];
+  const size = image ? publicImageSize(image) : undefined;
   return {
     title: { absolute: title },
     description,
     alternates: { canonical: product.path },
-    openGraph: { title, description, images: product.images.slice(0, 1) },
+    openGraph: {
+      title,
+      description,
+      url: product.path,
+      images: image ? [{ url: image, alt: product.title, ...size }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: image ? [image] : undefined,
+    },
+    other: {
+      "og:type": "product",
+      "product:price:amount": String(product.price),
+      "product:price:currency": "RUB",
+    },
   };
 }
 
