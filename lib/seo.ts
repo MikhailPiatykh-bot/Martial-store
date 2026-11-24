@@ -14,6 +14,7 @@ export function pageMeta(input: { title: string; description: string; path: stri
     description: input.description,
     alternates: { canonical: input.path },
     openGraph: {
+      type: "website",
       title: input.title,
       description: input.description,
       url: input.path,
