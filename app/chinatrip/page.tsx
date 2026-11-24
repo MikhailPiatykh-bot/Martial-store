@@ -1,14 +1,16 @@
-import type { Metadata } from "next";
 import { ChinaGallery } from "@/components/ChinaGallery";
+import { pageMeta } from "@/lib/seo";
 import { ChinaMaster } from "@/components/ChinaMaster";
 import { ChinaRail } from "@/components/ChinaRail";
 import { ChinaTripForm } from "@/components/ChinaTripForm";
 import { wuwayFaq, wuwayPhotos, wuwayReviews } from "@/lib/wuway";
 
-export const metadata: Metadata = {
-  title: { absolute: "Тур в китай" },
-  alternates: { canonical: "/chinatrip" },
-};
+export const metadata = pageMeta({
+  path: "/chinatrip",
+  title: "Тур в Китай — Martial Store",
+  description:
+    "Поездка в Китай с Martial Store и WuWay: тренировки ушу, сборная магазина и заявка на участие.",
+});
 
 export default function ChinaTripPage() {
   return (

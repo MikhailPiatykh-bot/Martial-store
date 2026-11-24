@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { Article } from "@/components/Article";
+import { pageMeta } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: { absolute: "Согласие на обработку персональных данных" },
-  alternates: { canonical: "/pers" },
-};
+export const metadata = pageMeta({
+  path: "/pers",
+  title: "Согласие на обработку персональных данных — Martial Store",
+  description:
+    "Согласие на обработку персональных данных при заказе товаров для ушу у ИП Пятых М. А.: цели, срок и отзыв согласия.",
+});
 
 export default function PersPage() {
   return (

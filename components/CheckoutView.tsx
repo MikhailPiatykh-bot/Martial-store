@@ -393,7 +393,7 @@ export function CheckoutView() {
             <div className="checkout-items">
               {cart.items.map((item) => (
                 <div className="checkout-item" key={`${item.path}-${item.variant}`}>
-                  {item.image ? <img src={item.image} alt="" /> : <span className="cart-ph" />}
+                  {item.image ? <img src={item.image} alt={item.title} /> : <span className="cart-ph" />}
                   <div>
                     <Link href={item.path}>{item.title}</Link>
                     <small>{item.variant || "Базовый вариант"}</small>

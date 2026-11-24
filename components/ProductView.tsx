@@ -154,7 +154,7 @@ export function ProductView({ product }: { product: Product }) {
           {slide?.kind === "video" ? (
             <VideoSlide src={slide.src} title={`Видео: ${product.title}`} />
           ) : slide?.kind === "image" ? (
-            <img src={slide.src} alt={product.title} draggable={false} />
+            <img src={slide.src} alt={`${product.title} — фото ${slideIndex - videos.length + 1}`} draggable={false} />
           ) : (
             <div className="ph" />
           )}
@@ -175,7 +175,7 @@ export function ProductView({ product }: { product: Product }) {
                     <span aria-hidden="true" />
                   </span>
                 ) : (
-                  <img src={item.src} alt="" />
+                  <img src={item.src} alt={`${product.title} — фото ${index - videos.length + 1}`} />
                 )}
               </button>
             ))}

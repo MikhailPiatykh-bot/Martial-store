@@ -148,7 +148,7 @@ export function CatalogView({
       ) : (
         <div className="cats" style={{ marginBottom: 18 }}>
           <Link className={allImage ? "cat has-photo" : "cat"} href="/catalog" aria-current="page">
-            {allImage ? <img src={allImage} alt="" /> : null}
+            {allImage ? <img src={allImage} alt="Все товары для ушу" /> : null}
             <span>Все товары</span>
           </Link>
           {categories.map((category) => {
@@ -159,7 +159,7 @@ export function CatalogView({
                 className={image ? "cat has-photo" : "cat"}
                 href={categoryHref(category.title)}
               >
-                {image ? <img src={image} alt="" /> : null}
+                {image ? <img src={image} alt={`${category.title} для ушу`} /> : null}
                 <span>{category.title}</span>
               </Link>
             );
@@ -249,7 +249,7 @@ export function CatalogView({
               {visible.map((card, index) => (
                 <Link key={card.path} href={card.path} className="card">
                   <span className="card-media">
-                    <CardImage src={card.image} priority={index < priorityCount} />
+                    <CardImage src={card.image} alt={card.title} priority={index < priorityCount} />
                   </span>
                   <div>
                     <small>{card.categories.join(" · ")}</small>

@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Article } from "@/components/Article";
+import { pageMeta } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: { absolute: "Пользовательское соглашение" },
-  alternates: { canonical: "/users-agreement" },
-};
+export const metadata = pageMeta({
+  path: "/users-agreement",
+  title: "Пользовательское соглашение — Martial Store",
+  description:
+    "Условия использования сайта martial-store.ru: каталог товаров для ушу, заказ, доставка и ссылки на оферту и политику данных.",
+});
 
 export default function UsersAgreementPage() {
   return (

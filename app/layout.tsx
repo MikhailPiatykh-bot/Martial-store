@@ -15,6 +15,14 @@ export const metadata: Metadata = {
   title: { absolute: "Инвентарь для ушу | Martial Store" },
   description:
     "Оружие, форма, обувь и аксессуары для ушу. Доставка по России в пункт СДЭК, самовывоз в Москве.",
+  openGraph: {
+    type: "website",
+    siteName: "Martial Store",
+    locale: "ru_RU",
+    url: "/",
+    images: [{ url: "/brand/og-default.jpg", width: 1200, height: 630, alt: "Martial Store — товары для ушу" }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

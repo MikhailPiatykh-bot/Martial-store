@@ -44,7 +44,7 @@ export function BazaView({
           <div className="baza-grid">
             {section.posts.map((post) => (
               <Link key={post.uid} className="baza-card" href={bazaPath(post.slug)}>
-                {post.image ? <img src={post.image} alt="" /> : <span className="baza-cover" />}
+                {post.image ? <img src={post.image} alt={post.title} /> : <span className="baza-cover" />}
                 <h3>{post.title}</h3>
                 {bazaExcerpt(post) ? <p>{bazaExcerpt(post)}</p> : null}
               </Link>

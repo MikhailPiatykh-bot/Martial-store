@@ -1,9 +1,17 @@
 import Link from "next/link";
 import { CardImage } from "@/components/CardImage";
+import { pageMeta } from "@/lib/seo";
 import { ReviewsRail } from "@/components/ReviewsRail";
 import { categories, categoryHref, categoryImage, priceLabel } from "@/lib/catalog";
 import { SALE_CATEGORY, rasprodazhaCards } from "@/lib/rasprodazha";
 import { loadYandexReviews, reviewsLabel, yandexReviewsUrl } from "@/lib/reviews";
+
+export const metadata = pageMeta({
+  path: "/",
+  title: "Товары для ушу в Москве — мечи, обувь Feiyue, ифу | Martial Store",
+  description:
+    "Магазин инвентаря для ушу и кунгфу: мечи, традиционное оружие, обувь Feiyue, ифу, экипировка для саньда. Шоурум в Москве, доставка СДЭК по России.",
+});
 
 export default async function HomePage() {
   const { reviews, total } = await loadYandexReviews();
@@ -39,7 +47,7 @@ export default async function HomePage() {
               {sale.map((card) => (
                 <Link key={card.path} href={card.path} className="card">
                   <span className="card-media">
-                    <CardImage src={card.image} />
+                    <CardImage src={card.image} alt={card.title} />
                   </span>
                   <div>
                     <small>{card.categories.join(" · ")}</small>
@@ -61,7 +69,7 @@ export default async function HomePage() {
               const image = categoryImage(category.title);
               return (
                 <Link key={category.uid} className={image ? "cat has-photo" : "cat"} href={categoryHref(category.title)}>
-                  {image ? <img src={image} alt="" /> : null}
+                  {image ? <img src={image} alt={`${category.title} для ушу`} /> : null}
                   <span>{category.title}</span>
                 </Link>
               );
