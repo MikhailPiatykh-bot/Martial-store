@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { Manrope, Unbounded } from "next/font/google";
+import { Suspense } from "react";
 import { CartProvider } from "@/components/CartProvider";
 import { SiteChrome } from "@/components/SiteChrome";
+import { YandexMetrika } from "@/components/YandexMetrika";
 import "./globals.css";
 
 const sans = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-sans" });
@@ -21,6 +23,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <CartProvider>
           <SiteChrome>{children}</SiteChrome>
         </CartProvider>
+        <Suspense fallback={null}>
+          <YandexMetrika />
+        </Suspense>
       </body>
     </html>
   );
