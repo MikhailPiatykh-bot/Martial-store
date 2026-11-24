@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 
 export function CountUp({ to }: { to: number }) {
-  const [value, setValue] = useState(0);
+  const [value, setValue] = useState(to);
   const ref = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
@@ -11,6 +11,7 @@ export function CountUp({ to }: { to: number }) {
     if (!node) return;
     let frame = 0;
     let started = false;
+    let sawHidden = false;
 
     const finish = () => {
       if (started) return;
@@ -20,6 +21,7 @@ export function CountUp({ to }: { to: number }) {
         setValue(to);
         return;
       }
+      setValue(0);
       const start = performance.now();
       const duration = 1800;
       const tick = (now: number) => {
@@ -33,7 +35,12 @@ export function CountUp({ to }: { to: number }) {
 
     const observer = new IntersectionObserver(
       ([entry]) => {
-        if (entry?.isIntersecting) finish();
+        if (!entry) return;
+        if (!entry.isIntersecting) {
+          sawHidden = true;
+          return;
+        }
+        if (sawHidden) finish();
       },
       { threshold: 0.15 },
     );

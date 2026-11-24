@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ProductView } from "@/components/ProductView";
 import { productBySlug, products } from "@/lib/catalog";
+import { productSeo } from "@/lib/seo";
 
 export function generateStaticParams() {
   return products.map((product) => ({ slug: product.slug }));
@@ -15,12 +16,12 @@ export async function generateMetadata({
   const { slug } = await params;
   const product = productBySlug(slug);
   if (!product) return { title: { absolute: "Товар не найден" } };
-  const description = product.lead || product.text.slice(0, 180);
+  const { title, description } = productSeo(product);
   return {
-    title: { absolute: product.title },
+    title: { absolute: title },
     description,
     alternates: { canonical: product.path },
-    openGraph: { title: product.title, description, images: product.images.slice(0, 1) },
+    openGraph: { title, description, images: product.images.slice(0, 1) },
   };
 }
 

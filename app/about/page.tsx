@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import { Article } from "@/components/Article";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: { absolute: "О нас" },
-  alternates: { canonical: "/about" },
-};
+export const metadata = pageMeta({
+  path: "/about",
+  title: "О магазине Martial Store — инвентарь для ушу",
+  description:
+    "Martial Store — магазин инвентаря для ушу в Москве: оригинальная продукция CC Wushu, Feiyue, Budosaga, Dari Huntong, Wesing, работа с клубами и тендерами.",
+});
 
 export default function AboutPage() {
   return (

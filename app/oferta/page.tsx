@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Article } from "@/components/Article";
+import { pageMeta } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: { absolute: "Договор оферты" },
-  alternates: { canonical: "/oferta" },
-};
+export const metadata = pageMeta({
+  path: "/oferta",
+  title: "Договор публичной оферты — Martial Store",
+  description:
+    "Публичная оферта ИП Пятых М. А. о розничной купле-продаже товаров для ушу дистанционным способом: заказ, доставка, оплата, возврат.",
+});
 
 export default function OfertaPage() {
   return (

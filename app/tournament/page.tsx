@@ -1,13 +1,13 @@
-import type { Metadata } from "next";
+import { pageMeta } from "@/lib/seo";
 import Link from "next/link";
 import { Article } from "@/components/Article";
 import { categoryHref } from "@/lib/catalog";
 
-export const metadata: Metadata = {
-  title: { absolute: "Кайши-2027" },
+export const metadata = pageMeta({
+  path: "/tournament",
+  title: "Кайши-2027 — Martial Store",
   description: "Открытый турнир и фестиваль боевых искусств «Кайши-2027», 27–28 февраля 2027.",
-  alternates: { canonical: "/tournament" },
-};
+});
 
 const docs = [
   {

@@ -188,7 +188,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           <section className="stats" aria-label="О магазине в цифрах">
             <div className="wrap stats-row">
               <article className="stat-square stat-square-athletes">
-                <p className="counter"><CountUp to={1572} /></p>
+                <p className="counter"><CountUp to={site.stats.orders2026} /></p>
                 <p className="orders-copy">
                   заказов отправлено
                   <br />
@@ -196,7 +196,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
                 </p>
               </article>
               <article className="stat-square stat-square-clubs">
-                <p className="counter"><CountUp to={100} /></p>
+                <p className="counter"><CountUp to={site.stats.clubs} /></p>
                 <p className="clubs-copy">
                   спортивных клубов уже сотрудничают
                   <br />
@@ -273,7 +273,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
                 <div className="cart-list">
                   {cart.items.map((item) => (
                     <div className="cart-line" key={`${item.path}-${item.variant}`}>
-                      {item.image ? <img src={item.image} alt="" /> : <span className="cart-ph" />}
+                      {item.image ? <img src={item.image} alt={item.title} /> : <span className="cart-ph" />}
                       <div>
                         <Link href={item.path} onClick={() => cart.setOpen(false)}>{item.title}</Link>
                         <small>{item.variant || "Базовый вариант"}</small>

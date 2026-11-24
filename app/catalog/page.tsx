@@ -1,11 +1,13 @@
-import type { Metadata } from "next";
 import { CatalogView } from "@/components/CatalogView";
 import { categoryFromParams, productsInCategory, toCard } from "@/lib/catalog";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: { absolute: "Martial Store | Инвентарь для ушу | Каталог" },
-  alternates: { canonical: "/catalog" },
-};
+export const metadata = pageMeta({
+  path: "/catalog",
+  title: "Каталог товаров для ушу — мечи, оружие, обувь, ифу | Martial Store",
+  description:
+    "Мечи дао и цзянь, традиционное оружие, обувь Feiyue, ифу, чехлы, палки и копья, саньда. Всё в наличии в Москве, отправка СДЭК по России.",
+});
 
 export default async function CatalogPage({
   searchParams,

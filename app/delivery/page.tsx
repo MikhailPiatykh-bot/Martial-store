@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import { Article } from "@/components/Article";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: { absolute: "Доставка и оплата" },
-  alternates: { canonical: "/delivery" },
-};
+export const metadata = pageMeta({
+  path: "/delivery",
+  title: "Доставка и оплата — Martial Store",
+  description:
+    "Доставка СДЭК до пункта выдачи по всей России, отправки по вторникам и четвергам. Самовывоз из шоурума в Москве. Оплата наличными и по безналу.",
+});
 
 export default function DeliveryPage() {
   return (

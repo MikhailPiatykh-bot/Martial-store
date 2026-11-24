@@ -1,10 +1,12 @@
-import type { Metadata } from "next";
 import { Article } from "@/components/Article";
+import { pageMeta } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: { absolute: "Правила возврата" },
-  alternates: { canonical: "/vozvrat" },
-};
+export const metadata = pageMeta({
+  path: "/vozvrat",
+  title: "Обмен и возврат — Martial Store",
+  description:
+    "Как вернуть или обменять товар надлежащего качества в течение 14 дней и что делать при браке. Условия возврата товаров для ушу.",
+});
 
 export default function VozvratPage() {
   return (

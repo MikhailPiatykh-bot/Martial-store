@@ -501,7 +501,7 @@ h1, h2, h3 { font-family: var(--font-display), Georgia, serif; font-weight: 500;
 }
 
 .section { padding: 36px 0 12px; }
-.section h2 { font-size: clamp(28px, 4vw, 42px); margin-bottom: 16px; }
+.section h2, .split h1 { font-size: clamp(28px, 4vw, 42px); margin-bottom: 16px; }
 .sale-head {
   display: flex;
   align-items: baseline;

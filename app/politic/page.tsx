@@ -1,12 +1,14 @@
-import type { Metadata } from "next";
 import Link from "next/link";
 import { Article } from "@/components/Article";
+import { pageMeta } from "@/lib/seo";
 import { site } from "@/lib/site";
 
-export const metadata: Metadata = {
-  title: { absolute: "Политика в отношении обработки персональных данных" },
-  alternates: { canonical: "/politic" },
-};
+export const metadata = pageMeta({
+  path: "/politic",
+  title: "Политика в отношении обработки персональных данных — Martial Store",
+  description:
+    "Политика ИП Пятых М. А. об обработке персональных данных покупателей Martial Store: какие данные нужны для заказа и кому они передаются.",
+});
 
 export default function PoliticPage() {
   return (

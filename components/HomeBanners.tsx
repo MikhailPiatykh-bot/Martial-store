@@ -21,10 +21,10 @@ type Slide = {
 };
 
 const brandLogos: BrandLogo[] = [
-  { src: "/brand/ccwushu.png", alt: "CC Wushu" },
-  { src: "/brand/feiyue.png", alt: "Feiyue" },
-  { src: "/brand/budosaga.png", alt: "Budosaga" },
-  { src: "/brand/wesing.png", alt: "Wesing" },
+  { src: "/brand/ccwushu.png", alt: "Логотип CC Wushu" },
+  { src: "/brand/feiyue.png", alt: "Логотип Feiyue" },
+  { src: "/brand/budosaga.png", alt: "Логотип Budosaga" },
+  { src: "/brand/wesing.png", alt: "Логотип Wesing" },
 ];
 
 const slides: Slide[] = [
@@ -170,14 +170,16 @@ export function HomeBanners() {
                   ) : null}
                 </div>
                 {item.logos ? (
-                  <div className="banner-visual logo-wall" aria-hidden="true">
+                  <div className="banner-visual logo-wall">
                     <ul>
                       {Array.from({ length: 24 }, (_, logoIndex) => {
-                        const logo = item.logos?.[logoIndex % item.logos.length];
+                        const logos = item.logos ?? [];
+                        const logo = logos[logoIndex % logos.length];
                         if (!logo) return null;
+                        const repeated = logoIndex >= logos.length;
                         return (
-                          <li key={logoIndex}>
-                            <img src={logo.src} alt="" />
+                          <li key={logoIndex} aria-hidden={repeated || undefined}>
+                            <img src={logo.src} alt={repeated ? "" : logo.alt} />
                           </li>
                         );
                       })}
@@ -198,7 +200,7 @@ export function HomeBanners() {
                 ) : (
                   <div className={item.logo ? "banner-visual has-logo" : "banner-visual"} aria-hidden={item.logo ? undefined : true}>
                     {item.logo ? (
-                      <img className="banner-logo" src={item.logo} alt="Логотип Профессионального Альянса Ушу и Кунгфу" />
+                      <img className="banner-logo" src={item.logo} alt="Официальный партнёр Профессионального Альянса Ушу и Кунгфу" />
                     ) : null}
                   </div>
                 )}

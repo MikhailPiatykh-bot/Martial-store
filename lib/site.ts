@@ -23,6 +23,10 @@ export const site = {
   ogrnip: "315774600280742",
   inn: "772374585850",
   offerDate: "08.04.2025",
+  stats: {
+    orders2026: 1572,
+    clubs: 100,
+  },
 };
 
 export const infoLinks = [
