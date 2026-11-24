@@ -3,6 +3,7 @@ import { ChinaGallery } from "@/components/ChinaGallery";
 import { ChinaMaster } from "@/components/ChinaMaster";
 import { ChinaRail } from "@/components/ChinaRail";
 import { ChinaTripForm } from "@/components/ChinaTripForm";
+import { SiteImage } from "@/components/SiteImage";
 import { wuwayFaq, wuwayPhotos, wuwayReviews } from "@/lib/wuway";
 
 export const metadata: Metadata = {
@@ -16,7 +17,7 @@ export default function ChinaTripPage() {
       <div className="wrap">
         <div className="china-hero">
           <div className="china-mark">
-            <img src="/wuway/mark.png" alt="WuWay" width={638} height={442} />
+            <SiteImage src="/wuway/mark.png" alt="WuWay" width={638} height={442} sizes="(max-width: 800px) 80vw, 420px" />
           </div>
           <div>
             <h1>Открой настоящий Китай</h1>

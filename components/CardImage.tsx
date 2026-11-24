@@ -3,9 +3,7 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 
-// Cards are about 180px on a phone and about 280px on a desktop, so the
-// browser picks a ~600px file. 1200px stays in the srcset for 2x layouts.
-const SIZES = "(max-width: 980px) 45vw, 280px";
+const SIZES = "(max-width: 600px) 50vw, (max-width: 1200px) 33vw, 300px";
 
 function CardPhoto({
   src,
@@ -35,13 +33,11 @@ function CardPhoto({
       <Image
         src={src}
         alt={alt}
-        width={600}
-        height={600}
+        width={828}
+        height={828}
         sizes={SIZES}
         decoding="async"
-        {...(priority
-          ? { priority: true, loading: "eager" as const, fetchPriority: "high" as const }
-          : { loading: "lazy" as const })}
+        {...(priority ? { priority: true, fetchPriority: "high" as const } : { loading: "lazy" as const })}
       />
     </span>
   );

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { useCart } from "@/components/CartProvider";
+import { SiteImage } from "@/components/SiteImage";
 import { formatPrice } from "@/lib/catalog";
 import { reachGoal, reachOrderSubmit } from "@/lib/metrika";
 import { site } from "@/lib/site";
@@ -393,7 +394,7 @@ export function CheckoutView() {
             <div className="checkout-items">
               {cart.items.map((item) => (
                 <div className="checkout-item" key={`${item.path}-${item.variant}`}>
-                  {item.image ? <img src={item.image} alt="" /> : <span className="cart-ph" />}
+                  {item.image ? <SiteImage src={item.image} alt="" width={128} height={128} sizes="56px" /> : <span className="cart-ph" />}
                   <div>
                     <Link href={item.path}>{item.title}</Link>
                     <small>{item.variant || "Базовый вариант"}</small>

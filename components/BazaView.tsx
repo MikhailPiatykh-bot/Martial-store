@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { SiteImage } from "@/components/SiteImage";
 import { bazaExcerpt, bazaPath, type BazaPost } from "@/lib/baza";
 
 const filters = [
@@ -44,7 +45,11 @@ export function BazaView({
           <div className="baza-grid">
             {section.posts.map((post) => (
               <Link key={post.uid} className="baza-card" href={bazaPath(post.slug)}>
-                {post.image ? <img src={post.image} alt="" /> : <span className="baza-cover" />}
+                {post.image ? (
+                  <SiteImage src={post.image} alt="" width={800} height={500} sizes="(max-width: 700px) 100vw, 360px" />
+                ) : (
+                  <span className="baza-cover" />
+                )}
                 <h3>{post.title}</h3>
                 {bazaExcerpt(post) ? <p>{bazaExcerpt(post)}</p> : null}
               </Link>

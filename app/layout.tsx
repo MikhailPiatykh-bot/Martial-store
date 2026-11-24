@@ -7,8 +7,8 @@ import { YandexMetrika } from "@/components/YandexMetrika";
 import { YandexMetrikaClicks, YandexMetrikaHit } from "@/components/YandexMetrikaTracker";
 import "./globals.css";
 
-const sans = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-sans" });
-const display = Unbounded({ subsets: ["latin", "cyrillic"], variable: "--font-display" });
+const sans = Manrope({ subsets: ["latin", "cyrillic"], variable: "--font-sans", display: "swap" });
+const display = Unbounded({ subsets: ["latin", "cyrillic"], variable: "--font-display", display: "swap" });
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://martial-store.ru"),

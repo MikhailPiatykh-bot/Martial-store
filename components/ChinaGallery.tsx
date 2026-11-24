@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { ChinaRail } from "@/components/ChinaRail";
+import { SiteImage } from "@/components/SiteImage";
 
-type Photo = { src: string; alt: string };
+type Photo = { src: string; alt: string; width: number; height: number };
 
 export function ChinaGallery({ photos }: { photos: Photo[] }) {
   const [open, setOpen] = useState<number | null>(null);
@@ -28,7 +29,7 @@ export function ChinaGallery({ photos }: { photos: Photo[] }) {
       <ChinaRail title="Галерея" arrows="sides">
         {photos.map((photo, index) => (
           <button key={photo.src} type="button" className="china-shot" onClick={() => setOpen(index)}>
-            <img src={photo.src} alt={photo.alt} />
+            <SiteImage src={photo.src} alt={photo.alt} width={photo.width} height={photo.height} sizes="180px" />
           </button>
         ))}
       </ChinaRail>
@@ -48,7 +49,14 @@ export function ChinaGallery({ photos }: { photos: Photo[] }) {
           >
             ‹
           </button>
-          <img src={current.src} alt={current.alt} onClick={(event) => event.stopPropagation()} />
+          <SiteImage
+            src={current.src}
+            alt={current.alt}
+            width={current.width}
+            height={current.height}
+            sizes="(max-width: 960px) 92vw, 960px"
+            onClick={(event) => event.stopPropagation()}
+          />
           <button
             type="button"
             className="china-lightbox-nav next"

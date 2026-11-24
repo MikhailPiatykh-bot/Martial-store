@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useLayoutEffect, useState } from "react";
 import { CountUp } from "@/components/CountUp";
 import { HomeBanners } from "@/components/HomeBanners";
+import { SiteImage } from "@/components/SiteImage";
 import { useCart } from "@/components/CartProvider";
 import { categories, categoryHref, formatPrice } from "@/lib/catalog";
 import { infoLinks, legalLinks, site } from "@/lib/site";
@@ -111,11 +112,13 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
           }
         }}
       >
-        <img
-          src="/brand/martial-header-3840.jpg"
-          srcSet="/brand/martial-header-1920.jpg 1920w, /brand/martial-header-2560.jpg 2560w, /brand/martial-header-3840.jpg 3840w"
-          sizes="100vw"
+        <SiteImage
+          src="/brand/martial-header.webp"
           alt="Martial Store"
+          width={1920}
+          height={483}
+          sizes="100vw"
+          priority
         />
       </Link>
       <header className="header">
@@ -131,7 +134,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
               }
             }}
           >
-            <img src="/brand/logo-icon.png" alt="" />
+            <SiteImage src="/brand/logo-icon.webp" alt="" width={192} height={187} sizes="56px" eager />
           </Link>
           <div className="header-social" aria-label="Мессенджеры">
             <a href={site.telegram} target="_blank" rel="noreferrer" aria-label="Telegram" title="Telegram">
@@ -273,7 +276,7 @@ export function SiteChrome({ children }: { children: React.ReactNode }) {
                 <div className="cart-list">
                   {cart.items.map((item) => (
                     <div className="cart-line" key={`${item.path}-${item.variant}`}>
-                      {item.image ? <img src={item.image} alt="" /> : <span className="cart-ph" />}
+                      {item.image ? <SiteImage src={item.image} alt="" width={128} height={128} sizes="64px" /> : <span className="cart-ph" />}
                       <div>
                         <Link href={item.path} onClick={() => cart.setOpen(false)}>{item.title}</Link>
                         <small>{item.variant || "Базовый вариант"}</small>
